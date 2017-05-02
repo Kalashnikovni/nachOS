@@ -1,0 +1,174 @@
+# This is part of a GNU Makefile, included by the Makefiles in
+# each of the subdirectories.
+#
+# This file includes all of the baseline code provided by Nachos.
+# Whenever you add a `.h`, `.hh` or `.cc` file, put it in the appropriate
+# `_H`, `_C`, or `_O` list.
+#
+# The dependency graph between assignments is:
+#
+# 1. `THREADS` before everything else.
+# 2. `USERPROG` must come before `VMEM`.
+# 3. `USERPROG` can come before or after `FILESYS`, but if `USERPROG` comes
+#    before (as in this distribution), then it must define `FILESYS_STUB`.
+#
+# Other than that, you have complete flexibility.
+#
+# Also whenever you change the include structure of your program, you should
+# do a `make depend` in the subdirectory -- this will modify the Makefile
+# to keep track of the new dependency.
+
+# You might want to play with the `CFLAGS`, but if you use `-O` it may
+# break the thread system.  You might want to use `-fno-inline` if
+# you need to call some inline functions from the debugger.
+
+# Copyright (c) 1992      The Regents of the University of California.
+#               2016-2017 Docentes de la Universidad Nacional de Rosario.
+# All rights reserved.  See `copyright.h` for copyright notice and
+# limitation of liability and disclaimer of warranty provisions.
+
+CFLAGS  = -g -Wall -Wshadow $(INCLUDE_DIRS) $(DEFINES) $(HOST) -DCHANGED
+LDFLAGS =
+
+# These definitions may change as the software is updated.
+# Some of them are also system dependent
+CPP = cpp
+CC  = g++
+LD  = g++
+AS  = as
+
+PROGRAM = nachos
+
+THREAD_H = ../threads/copyright.h   \
+           ../threads/list.hh       \
+           ../threads/scheduler.hh  \
+           ../threads/synch.hh      \
+           ../threads/synch_list.hh \
+           ../threads/system.hh     \
+           ../threads/thread.hh     \
+           ../threads/utility.hh    \
+           ../machine/interrupt.hh  \
+           ../machine/system_dep.hh \
+           ../machine/statistics.hh \
+           ../machine/timer.hh      \
+           ../threads/preemptive.hh
+THREAD_C = ../threads/main.cc        \
+           ../threads/scheduler.cc   \
+           ../threads/synch.cc       \
+           ../threads/system.cc      \
+           ../threads/thread.cc      \
+           ../threads/utility.cc     \
+           ../threads/thread_test.cc \
+           ../machine/interrupt.cc   \
+           ../machine/system_dep.cc  \
+           ../machine/statistics.cc  \
+           ../machine/timer.cc       \
+           ../threads/preemptive.cc
+THREAD_S = ../threads/switch.s
+THREAD_O = main.o        \
+           scheduler.o   \
+           synch.o       \
+           system.o      \
+           thread.o      \
+           utility.o     \
+           thread_test.o \
+           interrupt.o   \
+           statistics.o  \
+           system_dep.o  \
+           timer.o       \
+           preemptive.o
+
+USERPROG_H = ../userprog/address_space.hh \
+             ../userprog/bitmap.hh        \
+             ../filesys/file_system.hh    \
+             ../filesys/open_file.hh      \
+             ../machine/console.hh        \
+             ../machine/debugger.hh       \
+             ../machine/encoding.hh       \
+             ../machine/instruction.hh    \
+             ../machine/machine.hh        \
+             ../machine/translation_entry.hh
+USERPROG_C = ../userprog/address_space.cc \
+             ../userprog/bitmap.cc        \
+             ../userprog/exception.cc     \
+             ../userprog/prog_test.cc     \
+             ../machine/console.cc        \
+             ../machine/debugger.cc       \
+             ../machine/encoding.cc       \
+             ../machine/instruction.cc    \
+             ../machine/machine.cc        \
+             ../machine/mips_sim.cc       \
+             ../machine/translate.cc
+USERPROG_O = address_space.o \
+             bitmap.o        \
+             exception.o     \
+             prog_test.o     \
+             console.o       \
+             debugger.o      \
+             encoding.o      \
+             instruction.o   \
+             machine.o       \
+             mips_sim.o      \
+             translate.o
+
+VMEM_H =
+VMEM_C =
+VMEM_O =
+
+FILESYS_H = ../filesys/directory.hh   \
+            ../filesys/file_header.hh \
+            ../filesys/file_system.hh \
+            ../filesys/open_file.hh   \
+            ../filesys/synch_disk.hh  \
+            ../machine/disk.hh
+FILESYS_C = ../filesys/directory.cc   \
+            ../filesys/file_header.cc \
+            ../filesys/file_system.cc \
+            ../filesys/fs_test.cc     \
+            ../filesys/open_file.cc   \
+            ../filesys/synch_disk.cc  \
+            ../machine/disk.cc
+FILESYS_O = directory.o   \
+            file_header.o \
+            file_system.o \
+            fs_test.o     \
+            open_file.o   \
+            synch_disk.o  \
+            disk.o
+
+NETWORK_H = ../network/post.hh \
+            ../machine/network.hh
+NETWORK_C = ../network/net_test.cc \
+            ../network/post.cc     \
+            ../machine/network.cc
+NETWORK_O = net_test.o \
+            post.o     \
+            network.o
+
+S_OFILES = switch.o
+OFILES   = $(C_OFILES) $(S_OFILES)
+
+
+.PHONY: all depend
+
+all: $(PROGRAM)
+
+depend: $(CFILES) $(HFILES)
+    # WARNING: this may break if the preprocessor outputs something, because
+    # that would get mixed with the dependency output.
+	$(CC) $(INCLUDE_DIRS) $(DEFINES) $(HOST) -DCHANGED -M $^ \
+      >Makefile.depends
+
+$(PROGRAM): $(OFILES)
+	$(LD) $^ $(LDFLAGS) -o $@
+
+# Usage of `patsubst` is a hack that should be removed later.  The problem
+# is that `make depend` generates duplicate rules with different
+# dependencies, and it seems that different versions of GNU Make follow
+# different orders.
+$(C_OFILES): %.o:
+	$(CC) $(CFLAGS) -c $(patsubst %.hh,%.cc,$<)
+
+switch.o: ../threads/switch.s
+	$(CPP) -x assembler-with-cpp -c -P $(INCLUDE_DIRS) $(HOST) $^ >swtch.s
+#	$(AS) -o $@ swtch.s
