@@ -1,0 +1,145 @@
+Ejercicios Introductorios:
+
+1) En el archivo "machine.hh":
+     MEMORY_SIZE = NUM_PHYS_PAGES * PAGE SIZE;
+   donde:
+     NUM_PHYS_PAGES = 32;
+     PAGE_SIZE = SECTOR_SIZE;
+   y en "disk.hh":
+     SECTOR_SIZE = 128;
+   Entonces la memoria virtual equivale a 128*32 = 4096 bytes
+
+2) Ese valor cambiaria segun la cantidad de memoria fisica que
+   disponga la computadora.
+
+3) En el archivo "disk.cc":
+     DISK_SIZE = MAGIC_SIZE + NUM_SECTORS * SECTOR_SIZE;
+   donde:
+     MAGIC_SIZE = sizeof(int);
+                = 4
+   y en "disk.hh":
+     NUM_SECTORS = SECTORS_PER_TRACK * NUM_TRACKS;
+                 = 32 * 32 = 1024
+     SECTOR_SIZE = 128;
+   Entonces el tamaño de un disco es 4 + 1024 * 128 = 131076 bytes
+
+4) En el archivo "encoding.hh" se encuentran numeradas:
+     60 operaciones;
+
+5) Luego de decodificarla, suma los contenidos de los registros rs
+   y rt que pasa la instruccion como argumento.
+   (en encoding.hh: SIGN_BIT = 0x80000000)
+   Si ambos registros tienen igual signo, y si la suma cambia de
+   signo respecto a los mismos, se presenta overflow. Sino, se 
+   plasman los cambios en el registro rd.
+
+6) En un principio se llama a la funcion DEBUG (threads/utility.hh),
+   la cual a su vez llama a DebugIsEnabled (threads/utility.hh),
+   va_start (stdarg.h), vfprintf (stdio.h), va_end (stdarg.h) y 
+   fflush (stdio.h).
+   Luego se llama a la funcion Initialize (threads/system.hh),
+   la cual no llama a ninguna otra funcion.
+   Finalmente se llama a ThreadTest (threads/thread_test.cc), llama
+   a DEBUG (threads/utility.hh), strcpy (), al constructor de Thread,
+   a la funcion Fork de Thread, y a SimpleThread 
+   (threads/thread_test.cc).
+
+7) Porque las arquitecturas varian cpu a cpu y eso no permitiria
+   un estudio objetivo de los sistemas operativos. Ademas no se
+   podria garantizar la posibilidad de repetir cierto 
+   comportamiento en distintas computadoras independientemente de
+   que sistema de instrucciones utilize.
+
+8) 
+   Las banderas de depuracion son:
+    `+` -- prende todos los mensajes de debug.
+    `t` -- muestra todo mensaje relacionado a threads.
+    `s` -- muestra mensajes sobre semaforos, locks y condiciones.
+    `i` -- imprime en pantalla las interrupciones de programas.
+    `m` -- muestra en pantalla informacion relacionada a la emulacion
+           de operaciones de maquina.
+    `d` -- imprime mensajes sobre lectura y escritura a disco.
+    `f` -- muestra mensajes sobre lectura y escritura de archivos.
+    `a` -- imprime mensajes de operacion sobre registros maquina
+           emulados.
+    `n` -- muestra mensajes sobre el estado y las operaciones de la
+           red.
+ 
+9) ASSERT se aplica sobre una condicion booleana, si esta es falsa
+   la function imprime un mensaje de error a stderr y aborta la
+   ejecucion del programa.
+   DEBUG imprime un mensaje si la flag se encuentra encendida, el
+   archivo numera al principio ciertas flags definidas por default
+   , pero se pueden añadir nuevas agregandolas por la funcion
+   "DebugInit" en utility.cc.
+
+10) La constante USER_PROGRAM esta definida en los Makefile de las
+    carpetas filesys, network, userprog, vmem.
+    La constante FILESYS_NEEDED esta definida en los Makefile de
+    las carpetas filesys, network, userprog, vmem.
+    La constante FILESyS_STUB esta definida en los Makefile de las
+    carpetas userprog, vmem.
+    La constante NETWORK esta definida en los Makefile de la
+    carpeta network.
+
+11) La lista sincronizada o synchlist se basa en la lista comun,
+    pero implementa locks de forma de permitir que un solo thread
+    acceda a la misma a la vez. La funcion de Eliminar un elemento
+    dormira en caso de que la lista este vacia, y cuando un thread
+    llame a la funcion de Agregar un elemento, despertarra.
+    Redefine ademas la funcion Apply para usar dichos locks.
+
+12) En la carpeta /test, los archivos shell.c, filetest.c, sort.c, 
+    halt.c, matmult.c, tiny_shell.c
+    En la carpeta /threads, los archivos main.cc
+    En la carpeta /bin, los archivos out.c, coff2noff.c, main.c, 
+    coff2flat.c, disasm.c
+
+    Está definida en threads/main.cc.
+
+13) Soporta los comandos:
+        -d <debugflags> -rs <random seed #>
+        -s -x <nachos file> -c <consoleIn> <consoleOut>
+        -f -cp <unix file> <nachos file>
+        -p <nachos file> -r <nachos file> -l -D -t
+        -n <network reliability> -m <machine id>
+        -o <other machine id>
+        -z
+
+    La opcion -rs toma un parametro y actualiza la semilla de
+    randomizacion que determina cuando ocurren los yield de las
+    funciones, para que una corrida de los mismos sea reproducible.
+
+EN ARCHIVO: thread_test1.cc
+14)
+    Thread threadList = new Thread[5];
+
+    for (int i = 0; i < 5; i++) {
+        char *threadname = new char[128];
+        strcpy(threadname, (char)i);
+        threadList[i] = new Thread(threadname);
+        threadList[i] -> Fork(SimpleThread, (void*) threadname);
+    }
+
+EN ARCHIVO: thread_test2.cc
+15) 
+    //Global
+    ifdef SEMAPHORE_TEST   
+        Semaphore sem = new Semaphore("sem", 3);
+    endif
+
+    //Antes del for
+    ifdef SEMAPHORE_TEST
+        sem.P();
+    endif
+
+    //Despues del for
+    ifdef SEMAPHORE_TEST
+        sem.V();
+    endif
+
+EN ARCHIVO: thread_test_3.cc
+16)
+    (en utility.hh define la bandera):
+    DEBUG('s', "SimpleThread %s hizo un P", threadName);
+    DEBUG('s', "SimpleThread %s hizo un V", threadName);
