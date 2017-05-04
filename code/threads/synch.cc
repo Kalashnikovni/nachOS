@@ -90,36 +90,132 @@ Semaphore::V()
 /// Note -- without a correct implementation of `Condition::Wait`, the test
 /// case in the network assignment will not work!
 
+/*******************************
+ * LOCK
+ *******************************/
+
 Lock::Lock(const char *debugName)
-{}
+{
+    name = debugName;
+    locksem = new Sempaphore(debugName, 1);
+    holder = NULL;
+}
 
 Lock::~Lock()
-{}
+{
+    delete locksem;
+}
 
 void
 Lock::Acquire()
-{}
+{
+    ASSERT(!locksem->IsHeldByCurrentThread());
+
+    locksem->P();
+    holder = currentThread;
+}
 
 void
 Lock::Release()
-{}
+{
+    if(locksem->IsHeldByCurrentThread())
+        locksem->V();
+}
+
+bool
+Lock::IsHeldByCurrentThread()
+{
+    currentThread == holder;
+}
+
+/*******************************
+ * CONDITION VARIABLE
+ *******************************/
 
 Condition::Condition(const char *debugName, Lock *conditionLock)
-{}
+{
+    name = debugName;
+    lock = conditionLock;
+    list = new List<Semaphore*>();
+}
 
 Condition::~Condition()
-{}
+{
+    delete list;
+}
 
 void
 Condition::Wait()
 {
-    ASSERT(false);
+    ASSERT(lock->isHeldByCurrentThread());
+    Semaphore *sem = new Semaphore("ConditionSem", 0);    
+    list->Append(sem);
+
+    lock->Release();
+    s->P();
+    lock->Acquire();
 }
 
 void
 Condition::Signal()
-{}
+{
+    if(!(list->IsEmpty())){
+        (list->Remove())->V();
+    }
+}
 
 void
 Condition::Broadcast()
-{}
+{
+    while(!(list->IsEmpty())){
+        (list->Remove())->V();
+    }    
+}
+
+/*******************************
+ * PORT
+ *******************************/
+
+Port::Port(const char* debugName)
+{
+    name = debugName;
+    
+    lock = new Lock("Port lock");
+    condsend = new Condition("Port condition send", lock);
+    condrecv = new Condition("Port condition recv", lock);
+    inbox = false;
+}
+
+Port::~Port()
+{
+    delete cond;
+    delete lock;
+}
+
+Port::Send(int message)
+{
+    lock->Acquire();
+
+    while(inbox){
+        condsend->Wait();
+    }
+    buf = message;
+    
+    inbox = true;
+    condrecv->Signal(); //TODO: Si tiene q ser broadcast xq todos los recv pueden copiar hay que cambiar todo.
+    lock->Release();
+}
+
+Port::Receive(int *message)
+{
+    lock->Acquire();
+
+    while(!inbox){
+        condrecv->Wait();
+    }
+    *message = buf;
+
+    inbox = false;
+    condsend->Signal();
+    lock->Release();
+}

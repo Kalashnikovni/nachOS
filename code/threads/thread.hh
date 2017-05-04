@@ -91,6 +91,11 @@ private:
     /// All registers except for `stackTop`.
     HostMemoryAddress machineState[MACHINE_STATE_SIZE];
 
+    /// Port for Join children procs
+    Port *joinPort;
+    /// Number of joined procs
+    int joinCount;
+
 public:
 
     /// Initialize a `Thread`.

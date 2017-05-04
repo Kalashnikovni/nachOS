@@ -33,10 +33,12 @@ const unsigned STACK_FENCEPOST = 0xdeadbeef;
 /// * `threadName` is an arbitrary string, useful for debugging.
 Thread::Thread(const char* threadName)
 {
-    name     = threadName;
-    stackTop = NULL;
-    stack    = NULL;
-    status   = JUST_CREATED;
+    name      = threadName;
+    stackTop  = NULL;
+    stack     = NULL;
+    status    = JUST_CREATED;
+    joinPort  = new Port(threadName);
+    joinCount = 0;
 #ifdef USER_PROGRAM
     space    = NULL;
 #endif
@@ -57,6 +59,7 @@ Thread::~Thread()
     ASSERT(this != currentThread);
     if (stack != NULL)
         DeallocBoundedArray((char *) stack, STACK_SIZE * sizeof *stack);
+    delete joinPort;
 }
 
 /// Invoke `(*func)(arg)`, allowing caller and callee to execute

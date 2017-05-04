@@ -110,10 +110,14 @@ public:
 
 private:
 
-    /// For debugging.
+    // For debugging
     const char* name;
 
-    // Add other needed fields here.
+    // Thread who holds the Lock
+    Thread *holder;
+
+    // Implements locks with semaphores
+    Semaphore *locksem;
 };
 
 // This class defined a “condition variable”.
@@ -172,10 +176,59 @@ public:
 
 private:
 
+    // Useful for debugging
     const char *name;
 
-    // Other needed fields are to be added here.
+    // Useful lock
+    Lock *lock;
+
+    // Semaphore for implementation
+    Semaphore *condSem;
 };
+
+
+// This class defines a "port".
+//
+// A port is a message passing mechanism that allows senders to synch
+// with their respective receivers.
+//
+// The function Send waits as an atomic operation for a Receive call
+// who copies the message into a buffer.
+// Once the copie has been made, both are allowed to return.
+//
+// The Receive call is also blocking (waiting for a Send to be made).
+// There can be multiple senders and receivers in a port.
+
+class Port {
+public:
+    //Constructor
+    Port(const char* debugName);
+
+    //Destructor
+    ~Port();
+
+    //Send
+    void Send(int message);
+
+    //Receive:
+    void Receive(int *message);
+
+private:
+    //Useful for debug purposes
+    const char* name;
+
+    //Bool to implement conditions
+    bool inbox;
+
+    //Condition to implement port
+    Condition *cond; 
+
+    //Lock to implement conditions
+    Lock lock;
+
+    //Buffer to store the message
+    int buf;
+}
 
 
 #endif
