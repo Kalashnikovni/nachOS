@@ -46,6 +46,7 @@
 #include "userprog/address_space.hh"
 #endif
 
+class Port;
 
 /// CPU register state to be saved on context switch.
 ///
@@ -91,15 +92,10 @@ private:
     /// All registers except for `stackTop`.
     HostMemoryAddress machineState[MACHINE_STATE_SIZE];
 
-    /// Port for Join children procs
-    Port *joinPort;
-    /// Number of joined procs
-    int joinCount;
-
 public:
 
     /// Initialize a `Thread`.
-    Thread(const char *debugName);
+    Thread(const char *debugName, bool joineable);
 
     /// Deallocate a Thread.
     ///
@@ -121,6 +117,8 @@ public:
     /// The thread is done executing.
     void Finish();
 
+    /// The thread waits for a children.
+    void Join();
 
     /// Check if thread has overflowed its stack.
     void CheckOverflow();
@@ -156,6 +154,12 @@ private:
 
     /// Allocate a stack for thread.  Used internally by `Fork`.
     void StackAllocate(VoidFunctionPtr func, void *arg);
+    
+    /// Private data for Join:
+    /// Port for Join children procs
+    Port *joinPort;
+    ///
+    bool isJoineable;
 
 #ifdef USER_PROGRAM
     /// User-level CPU register state.

@@ -183,7 +183,7 @@ private:
     Lock *lock;
 
     // Semaphore for implementation
-    Semaphore *condSem;
+    List<Semaphore *> *list;
 };
 
 
@@ -221,14 +221,15 @@ private:
     bool inbox;
 
     //Condition to implement port
-    Condition *cond; 
+    Condition *condsend;
+    Condition *condrecv; 
 
     //Lock to implement conditions
-    Lock lock;
+    Lock *lock;
 
     //Buffer to store the message
     int buf;
-}
+};
 
 
 #endif

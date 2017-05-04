@@ -49,8 +49,9 @@ ThreadTest()
 
     char *name = new char[64];
     strncpy(name, "2nd", 64);
-    Thread *newThread = new Thread(name);
+    Thread *newThread = new Thread(name, true); //Is joineable
     newThread->Fork(SimpleThread, (void *) name);
+    newThread->Join();
 
     SimpleThread((void *) "1st");
 }

@@ -31,14 +31,17 @@ const unsigned STACK_FENCEPOST = 0xdeadbeef;
 /// `Thread::Fork`.
 ///
 /// * `threadName` is an arbitrary string, useful for debugging.
-Thread::Thread(const char* threadName)
+Thread::Thread(const char* threadName, bool joineable = false)
 {
-    name      = threadName;
-    stackTop  = NULL;
-    stack     = NULL;
-    status    = JUST_CREATED;
-    joinPort  = new Port(threadName);
-    joinCount = 0;
+    name           = threadName;
+    stackTop       = NULL;
+    stack          = NULL;
+    status         = JUST_CREATED;
+    isJoineable    = joineable;
+    if (isJoineable)
+        joinPort   = new Port(threadName);
+    else
+        joinPort   = 0; //null
 #ifdef USER_PROGRAM
     space    = NULL;
 #endif
@@ -135,6 +138,9 @@ Thread::Finish()
     ASSERT(this == currentThread);
 
     DEBUG('t', "Finishing thread \"%s\"\n", getName());
+
+    if (isJoineable)
+        joinPort->Send(0); //Waits for father to end
 
     threadToBeDestroyed = currentThread;
     Sleep();  // Invokes `SWITCH`.
@@ -257,6 +263,18 @@ Thread::StackAllocate(VoidFunctionPtr func, void *arg)
     machineState[WhenDonePCState] = (HostMemoryAddress) ThreadFinish;
 }
 
+
+///
+///
+///
+void
+Thread::Join()
+{
+    int retAddr;
+    joinPort->Receive(&retAddr); //Wait for child to return.
+    delete joinPort; //FIXME Maybe
+}
+
 #ifdef USER_PROGRAM
 #include "machine.hh"
 
@@ -283,5 +301,6 @@ Thread::RestoreUserState()
     for (unsigned i = 0; i < NUM_TOTAL_REGS; i++)
         machine->WriteRegister(i, userRegisters[i]);
 }
+
 
 #endif

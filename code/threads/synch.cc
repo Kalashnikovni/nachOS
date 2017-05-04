@@ -97,7 +97,7 @@ Semaphore::V()
 Lock::Lock(const char *debugName)
 {
     name = debugName;
-    locksem = new Sempaphore(debugName, 1);
+    locksem = new Semaphore(debugName, 1);
     holder = NULL;
 }
 
@@ -109,23 +109,21 @@ Lock::~Lock()
 void
 Lock::Acquire()
 {
-    ASSERT(!locksem->IsHeldByCurrentThread());
-
-    locksem->P();
     holder = currentThread;
+    locksem->P();
 }
 
 void
 Lock::Release()
 {
-    if(locksem->IsHeldByCurrentThread())
+    if(IsHeldByCurrentThread())
         locksem->V();
 }
 
 bool
 Lock::IsHeldByCurrentThread()
 {
-    currentThread == holder;
+    return currentThread == holder;
 }
 
 /*******************************
@@ -147,12 +145,12 @@ Condition::~Condition()
 void
 Condition::Wait()
 {
-    ASSERT(lock->isHeldByCurrentThread());
+    ASSERT(lock->IsHeldByCurrentThread());
     Semaphore *sem = new Semaphore("ConditionSem", 0);    
     list->Append(sem);
 
     lock->Release();
-    s->P();
+    sem->P();
     lock->Acquire();
 }
 
@@ -180,7 +178,7 @@ Port::Port(const char* debugName)
 {
     name = debugName;
     
-    lock = new Lock("Port lock");
+    lock = new Lock(debugName);
     condsend = new Condition("Port condition send", lock);
     condrecv = new Condition("Port condition recv", lock);
     inbox = false;
@@ -188,10 +186,12 @@ Port::Port(const char* debugName)
 
 Port::~Port()
 {
-    delete cond;
+    delete condsend;
+    delete condrecv;
     delete lock;
 }
 
+void
 Port::Send(int message)
 {
     lock->Acquire();
@@ -206,6 +206,7 @@ Port::Send(int message)
     lock->Release();
 }
 
+void
 Port::Receive(int *message)
 {
     lock->Acquire();
