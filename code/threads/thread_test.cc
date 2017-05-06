@@ -47,11 +47,11 @@ ThreadTest()
 {
     DEBUG('t', "Entering SimpleTest");
 
-    char *name = new char[64];
+    char *name  = new char[64];
     strncpy(name, "2nd", 64);
-    Thread *newThread = new Thread(name, 0, true); //Is joineable
+    Thread *newThread  = new Thread(name, 1, true); //Is joineable
     newThread->Fork(SimpleThread, (void *) name);
-    newThread->Join();
+    //newThread->Join();
 
     SimpleThread((void *) "1st");
 }

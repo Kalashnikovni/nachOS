@@ -109,6 +109,9 @@ Lock::~Lock()
 void
 Lock::Acquire()
 {
+    if (currentThread->getPriority() > holder->getPriority())
+        holder->setPriority(currentThread->getPriority());        
+ 
     holder = currentThread;
     locksem->P();
 }
@@ -116,8 +119,10 @@ Lock::Acquire()
 void
 Lock::Release()
 {
-    if(IsHeldByCurrentThread())
+    if(IsHeldByCurrentThread()) {
+        currentThread->setPriority(currentThread->getOriginalPriority());
         locksem->V();
+    }
 }
 
 bool

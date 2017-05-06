@@ -143,6 +143,16 @@ public:
         return priority;
     }
 
+    void setPriority(int p)
+    {
+        priority = p;
+    }
+
+    int getOriginalPriority()
+    {
+        return originalPriority;
+    }
+
 private:
     // Some of the private data for this class is listed above.
 
@@ -167,6 +177,8 @@ private:
     bool isJoineable;
 
     int priority;
+
+    int originalPriority;
 
 #ifdef USER_PROGRAM
     /// User-level CPU register state.
