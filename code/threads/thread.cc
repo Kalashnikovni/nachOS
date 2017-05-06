@@ -37,7 +37,7 @@ Thread::Thread(const char* threadName, int prior, bool joineable)
     stackTop         = NULL;
     stack            = NULL;
     status           = JUST_CREATED;
-    priority         = 0;
+    priority         = prior;
     originalPriority = prior;
     isJoineable      = joineable;
     if (isJoineable)
