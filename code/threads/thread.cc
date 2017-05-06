@@ -62,7 +62,6 @@ Thread::~Thread()
     ASSERT(this != currentThread);
     if (stack != NULL)
         DeallocBoundedArray((char *) stack, STACK_SIZE * sizeof *stack);
-    delete joinPort;
 }
 
 /// Invoke `(*func)(arg)`, allowing caller and callee to execute
