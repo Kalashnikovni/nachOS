@@ -109,8 +109,8 @@ Lock::~Lock()
 void
 Lock::Acquire()
 {
-    holder = currentThread;
     locksem->P();
+    holder = currentThread;
 }
 
 void
