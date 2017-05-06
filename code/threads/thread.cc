@@ -31,12 +31,13 @@ const unsigned STACK_FENCEPOST = 0xdeadbeef;
 /// `Thread::Fork`.
 ///
 /// * `threadName` is an arbitrary string, useful for debugging.
-Thread::Thread(const char* threadName, bool joineable)
+Thread::Thread(const char* threadName, int prior, bool joineable)
 {
     name           = threadName;
     stackTop       = NULL;
     stack          = NULL;
     status         = JUST_CREATED;
+    priority       = prior;
     isJoineable    = joineable;
     if (isJoineable)
         joinPort   = new Port(threadName);

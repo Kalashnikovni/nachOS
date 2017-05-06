@@ -10,6 +10,10 @@
 #ifndef NACHOS_THREADS_SCHEDULER__HH
 #define NACHOS_THREADS_SCHEDULER__HH
 
+#ifndef SCHEDULER_PRIORITY_NUMBER
+#define SCHEDULER_PRIORITY_NUMBER 10
+#endif
+
 
 #include "list.hh"
 #include "thread.hh"

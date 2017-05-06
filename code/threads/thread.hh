@@ -95,7 +95,7 @@ private:
 public:
 
     /// Initialize a `Thread`.
-    Thread(const char *debugName, bool joineable = false);
+    Thread(const char *debugName, int prior = 0, bool joineable = false);
 
     /// Deallocate a Thread.
     ///
@@ -138,6 +138,11 @@ public:
         printf("%s, ", name);
     }
 
+    int getPriority()
+    {
+        return priority;
+    }
+
 private:
     // Some of the private data for this class is listed above.
 
@@ -160,6 +165,8 @@ private:
     Port *joinPort;
     ///
     bool isJoineable;
+
+    int priority;
 
 #ifdef USER_PROGRAM
     /// User-level CPU register state.
