@@ -270,9 +270,11 @@ Thread::StackAllocate(VoidFunctionPtr func, void *arg)
 void
 Thread::Join()
 {
+    ASSERT(joinPort != NULL);
     int retAddr;
     joinPort->Receive(&retAddr); //Wait for child to return.
-    delete joinPort; //FIXME Maybe
+
+    delete joinPort;
 }
 
 #ifdef USER_PROGRAM

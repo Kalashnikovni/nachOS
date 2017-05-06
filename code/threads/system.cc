@@ -159,7 +159,7 @@ Initialize(int argc, char **argv)
     // We did not explicitly allocate the current thread we are running in.
     // But if it ever tries to give up the CPU, we better have a `Thread`
     // object to save its state.
-    currentThread = new Thread("main", 0); //TODO: Is the joineable parameter 0?
+    currentThread = new Thread("main");
     currentThread->setStatus(RUNNING);
 
     interrupt->Enable();
