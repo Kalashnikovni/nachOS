@@ -31,7 +31,7 @@ const unsigned STACK_FENCEPOST = 0xdeadbeef;
 /// `Thread::Fork`.
 ///
 /// * `threadName` is an arbitrary string, useful for debugging.
-Thread::Thread(const char* threadName, bool joineable = false)
+Thread::Thread(const char* threadName, bool joineable)
 {
     name           = threadName;
     stackTop       = NULL;
