@@ -27,3 +27,11 @@
 *.exe
 *.out
 *.app
+
+#Otros
+*.depends
+*.s
+nachos
+coff2flat
+coff2noff
+disassemble
