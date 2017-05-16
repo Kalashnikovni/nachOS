@@ -40,11 +40,16 @@
 
 
 #include "utility.hh"
+#include "filesys/open_file.hh"
+#include "userprog/syscall.h"
 
 #ifdef USER_PROGRAM
 #include "machine/machine.hh"
 #include "userprog/address_space.hh"
 #endif
+
+
+#define MAX_OPEN_FILES 1000
 
 class Port;
 
@@ -153,6 +158,12 @@ public:
         return originalPriority;
     }
 
+    OpenFileId AddFile(OpenFile *file);
+
+    bool RemoveFile(OpenFileId fid);
+
+    OpenFile *GetFile(OpenFileId fid);
+
 private:
     // Some of the private data for this class is listed above.
 
@@ -179,6 +190,8 @@ private:
     int priority;
 
     int originalPriority;
+
+    OpenFile *fileTable[MAX_OPEN_FILES];
 
 #ifdef USER_PROGRAM
     /// User-level CPU register state.

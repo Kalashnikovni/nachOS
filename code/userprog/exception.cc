@@ -24,7 +24,11 @@
 
 #include "syscall.h"
 #include "threads/system.hh"
+#include "filesys/file_system.hh"
+#include "filesys/open_file.hh"
+#include "iobuffer.hh"
 
+void IncreasePC();
 
 /// Entry point into the Nachos kernel.  Called when a user program is
 /// executing, and either does a syscall, or generates an addressing or
@@ -48,62 +52,119 @@ void
 ExceptionHandler(ExceptionType which)
 {
 
+    int type = machine->ReadRegister(2);
     if (which == SYSCALL_EXCEPTION) {
-        int type = machine->ReadRegister(2);
         switch(type){
             case SC_Halt:
                 DEBUG('a', "Shutdown, initiated by user program.\n");
                 interrupt->Halt();
                 break;
+
             case SC_Create:
+            {
                 int pname = machine->ReadRegister(4);
                 char name[128];
                 //Create the file
-                ReadStringFromUser(pname, name, 128); //Releer la implementacion y ver si funciona cuando corta por exceso de caracteres y si deja un EOF
-                filesys->Create(name,0);
-                //Increase the PC
-                machine->WriteRegister(PREV_PC_REG, machine->ReadRegister(PC_REG);
-                machine->WriteRegister(PC_REG, machine->ReadRegister(PC_REG)+4);
-                machine->WriteRegister(NEXT_PC_REG, machine->ReadRegister(PC_REG)+4); //FIXME?
+                ReadStringFromUser(pname, name, 128);
+                int created = fileSystem->Create(name,0)?1:0;
+                machine->WriteRegister(2, created);
+                IncreasePC();
                 break;
+            }
+
             case SC_Read:
+            {
                 int pbuf = machine->ReadRegister(4);
                 int size = machine->ReadRegister(5);
                 OpenFileId id = machine->ReadRegister(6);
+                char *mbuf = new char[size];
                 //Obtain file from filesystem
-                filesys //Check if fileid exists and what file it corresponds to
-                //Read the file
-                ReadBufferFromUser(/*TODO*/, pbuf, size); //TODO: If file is not long enough...?!
+                int read = -1;
+                if(id >= 0){
+                    OpenFile *f = currentThread->GetFile(id);
+                    if(f != NULL) {
+                        //Read the file
+                        read = f->Read(mbuf, size);
+                        WriteBufferToUser((const char*)mbuf,pbuf,size);
+                    }
+                }
                 //Return how much was read
-                machine->WriteRegister(2, /*TODO*/);
-                //Increase the PC
-                /*TODO*/
+                machine->WriteRegister(2, read);
+                IncreasePC();
                 break;
+            }
+
             case SC_Write:
+            {
+                int pbuf = machine->ReadRegister(4);
+                int size = machine->ReadRegister(5);
+                OpenFileId id = machine->ReadRegister(6);
+                char *mbuf = new char[size];
+                //Obtain file from filesystem
+                OpenFile *f = currentThread->GetFile(id);
+                int wrote = -1;
+                if(f != NULL) {
+                    ReadBufferFromUser(pbuf,mbuf,size);
+                    wrote = f->Write((const char*)mbuf,size);
+                }
+                //Return how much was written
+                machine->WriteRegister(2, wrote);
+                IncreasePC();
                 break;
+            }
+
             case SC_Open:
+            {
                 int pname = machine->ReadRegister(4);
-                char name[128];
-                ReadStringFromUser(pname, name, 128);
                 //Open the file
-                OpenFile *f = filesys->Open(name);
-                if(f == NULL) {/*TODO*/}
-                OpenFileId fid = /*TODO: Crear la funcion que asocia y crea un file id*/
+                OpenFile *f = fileSystem->Open((const char*)pname);
+                OpenFileId fid = -1;
+                if(f != NULL) {
+                    fid = currentThread->AddFile(f);
+                    if(fid < 0)
+                        fileSystem->Remove((const char*)pname);
+                }
                 //Return the fileid
                 machine->WriteRegister(2, fid);
-                //Increase the PC
-                /*TODO*/
+                IncreasePC();
                 break;
+            }
+
             case SC_Close:
+            {
+                OpenFileId id = machine->ReadRegister(4);
+                //Close the file
+                bool ret = currentThread->RemoveFile(id);
+                //Return if successful
+                machine->WriteRegister(2, ret);
+                IncreasePC();
                 break;
+            }
+
             case SC_Exit:
-                break;
+            {    break;}
+
             case SC_Join:
-                break;
+            {    break;}
+
             case SC_Exec:
-                break;
+            {    break;}
+        }
     } else {
         printf("Unexpected user mode exception %d %d\n", which, type);
         ASSERT(false);
     }
 }
+
+
+void
+IncreasePC()
+{
+    int pc = machine->ReadRegister(PC_REG);
+    machine->WriteRegister(PREV_PC_REG, pc);
+    pc = machine->ReadRegister(NEXT_PC_REG);
+    machine->WriteRegister(PC_REG, pc);
+    pc += 4;
+    machine->WriteRegister(NEXT_PC_REG, pc);
+}
+

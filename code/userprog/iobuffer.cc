@@ -2,10 +2,12 @@
 // relaying mainly on the functions ReadMem and
 // WriteMem defined in machine/translate
 
-#include "machine/translate.cc"
+#include "machine.hh"
+#include "system.hh"
+#include "iobuffer.hh"
 
-#define READMEM(addr,size,val) ASSERT(machine->ReadMem(addr,size,val))
-#define WRITEMEM(addr,size,val) (machine->Writemem(addr,size,val))
+#define READMEM(addr,size,val) ASSERT(machine->ReadMem((unsigned)addr,(unsigned)size,(int*)val))
+#define WRITEMEM(addr,size,val) ASSERT(machine->WriteMem((unsigned)addr,(unsigned)size,(int)val))
 
 
 // Read a null terminated string from user mem
@@ -19,7 +21,7 @@ ReadStringFromUser(int addr, char *strbuf, unsigned maxcount)
         READMEM(addr+i, 1, strbuf+i);
         i++;
         READMEM(addr+i, 1, &c);
-    } while (c != '\0');
+    } while ((c != '\0') && (i < maxcount-2));
     strbuf[i]='\0'; //add EOF
 }
 
@@ -64,7 +66,7 @@ SpareReadBufferFromUser(int addr, char *outbuf, unsigned count)
 }
 
 
-// Write a null terminated string to user mem
+// Write a null terminated string to machine mem
 void
 WriteStringToUser(const char *str, int addr)
 {
@@ -72,11 +74,11 @@ WriteStringToUser(const char *str, int addr)
     for(i=0; str[i] != '\0'; i++){
         WRITEMEM(addr+i, 1, str[i]);
     }
-    WRITEMEM(addr+i+1, 1, '\0'); //TODO: Esta bien asi?
+    WRITEMEM(addr+i+1, 1, '\0');
 }
 
 
-// Write a buffer to a user memory space
+// Write a buffer to a machine memory space
 // Short version, many disk read/writes
 void
 WriteBufferToUser(const char *buf, int addr, unsigned count)
@@ -87,7 +89,7 @@ WriteBufferToUser(const char *buf, int addr, unsigned count)
     }
 }
 
-// Write a buffer to a user memory space
+// Write a buffer to a machine memory space
 // Long version, less disk read/writes
 void
 SpareWriteBufferToUser(const char *buf, int addr, unsigned count)
@@ -100,13 +102,13 @@ SpareWriteBufferToUser(const char *buf, int addr, unsigned count)
     switch(i){
         case 3:  //Read 3 bytes more
             WRITEMEM(addr+i, 2, buf[i]);
-            WRITEMEM(addr+i+2, 1, outbuf[i+2]);
+            WRITEMEM(addr+i+2, 1, buf[i+2]);
             break;
         case 2:  //Read 2 bytes more
             WRITEMEM(addr+i, 2, buf[i]);
             break;
         case 1:  //Read 1 byte more
-            WRITEMEM(addr+i, 1, outbuf[i]);
+            WRITEMEM(addr+i, 1, buf[i]);
             break;
         default: //End
             break;

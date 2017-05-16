@@ -80,6 +80,7 @@ THREAD_O = main.o        \
 
 USERPROG_H = ../userprog/address_space.hh \
              ../userprog/bitmap.hh        \
+             ../userprog/iobuffer.hh      \
              ../filesys/file_system.hh    \
              ../filesys/open_file.hh      \
              ../machine/console.hh        \
@@ -89,6 +90,7 @@ USERPROG_H = ../userprog/address_space.hh \
              ../machine/machine.hh        \
              ../machine/translation_entry.hh
 USERPROG_C = ../userprog/address_space.cc \
+             ../userprog/iobuffer.cc      \
              ../userprog/bitmap.cc        \
              ../userprog/exception.cc     \
              ../userprog/prog_test.cc     \
@@ -100,6 +102,7 @@ USERPROG_C = ../userprog/address_space.cc \
              ../machine/mips_sim.cc       \
              ../machine/translate.cc
 USERPROG_O = address_space.o \
+             iobuffer.o      \
              bitmap.o        \
              exception.o     \
              prog_test.o     \

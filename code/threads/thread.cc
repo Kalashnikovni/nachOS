@@ -278,6 +278,43 @@ Thread::Join()
     delete joinPort;
 }
 
+///
+OpenFileId
+Thread::AddFile(OpenFile *file)
+{
+    int i;
+
+    for(i=0; i<MAX_OPEN_FILES; i++){
+        if(fileTable[i] == NULL){
+            fileTable[i] = file;
+            return i;
+        } 
+    }
+    //No space in table
+    return -1;    
+}
+
+///
+bool
+Thread::RemoveFile(OpenFileId fid)
+{
+    if(fid < MAX_OPEN_FILES){
+        fileTable[fid] = NULL;
+        return true;
+    }
+    return false;
+}
+
+///
+OpenFile *
+Thread::GetFile(OpenFileId fid)
+{
+    if(fid < MAX_OPEN_FILES)
+        return fileTable[fid];
+    return NULL;
+}
+
+
 #ifdef USER_PROGRAM
 #include "machine.hh"
 
