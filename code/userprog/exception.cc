@@ -77,15 +77,15 @@ ExceptionHandler(ExceptionType which)
                 int pbuf = machine->ReadRegister(4);
                 int size = machine->ReadRegister(5);
                 OpenFileId id = machine->ReadRegister(6);
-                char *mbuf = new char[size];
+                char mbuf[size];
                 //Obtain file from filesystem
                 int read = -1;
                 if(id >= 0){
                     OpenFile *f = currentThread->GetFile(id);
                     if(f != NULL) {
                         //Read the file
-                        read = f->Read(mbuf, size);
-                        WriteBufferToUser((const char*)mbuf,pbuf,size);
+                        read = f->Read(mbuf,size);
+                        WriteBufferToUser(mbuf,pbuf,size);
                     }
                 }
                 //Return how much was read
@@ -116,13 +116,15 @@ ExceptionHandler(ExceptionType which)
             case SC_Open:
             {
                 int pname = machine->ReadRegister(4);
+                char name[128];
                 //Open the file
-                OpenFile *f = fileSystem->Open((const char*)pname);
+                ReadStringFromUser(pname, name, 128);
+                OpenFile *f = fileSystem->Open(name);
                 OpenFileId fid = -1;
                 if(f != NULL) {
                     fid = currentThread->AddFile(f);
                     if(fid < 0)
-                        fileSystem->Remove((const char*)pname);
+                        fileSystem->Remove(name);
                 }
                 //Return the fileid
                 machine->WriteRegister(2, fid);
