@@ -16,12 +16,11 @@ void
 ReadStringFromUser(int addr, char *strbuf, unsigned maxcount)
 {
     int i=0;
-    char c; 
+    int c; 
     do {
-        READMEM(addr+i, 1, strbuf+i);
-        i++;
         READMEM(addr+i, 1, &c);
-    } while ((c != '\0') && (i < maxcount-2));
+	strbuf[i++] = c;
+    } while ((c != '\0') && (i < maxcount-1));
     strbuf[i]='\0'; //add EOF
 }
 
@@ -32,15 +31,17 @@ ReadStringFromUser(int addr, char *strbuf, unsigned maxcount)
 void
 ReadBufferFromUser(int addr, char *outbuf, unsigned count)
 {
-    int i;
+    int i,c;
     for (i=0; i < count; i++){
-        READMEM(addr+i, 1, outbuf+i);
+        READMEM(addr+i, 1, &c);
+	outbuf[i] = c;
     }
 }
 
 // Read from user mem to a buffer
 // Long version, less disk read/writes
 // (Address assumed to be 4 byte aligned)
+// FIXME: Do with an int c
 void
 SpareReadBufferFromUser(int addr, char *outbuf, unsigned count)
 {
@@ -67,6 +68,7 @@ SpareReadBufferFromUser(int addr, char *outbuf, unsigned count)
 
 
 // Write a null terminated string to machine mem
+// FIXME: Do with a (do,while)
 void
 WriteStringToUser(const char *str, int addr)
 {

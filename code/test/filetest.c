@@ -19,5 +19,6 @@ main(void)
     OpenFileId o = Open("test.txt");
     Write("Hello world\n",12,o);
     Close(o);
+    Halt();
     // Not reached.
 }

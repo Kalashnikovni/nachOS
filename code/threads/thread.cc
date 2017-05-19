@@ -122,7 +122,8 @@ Thread::CheckOverflow()
 }
 
 /// Called by `ThreadRoot` when a thread is done executing the forked
-/// procedure.
+/// procedure. The return status is passed on to the joining parent
+/// if any.
 ///
 /// NOTE: we do not immediately de-allocate the thread data structure or the
 /// execution stack, because we are still running in the thread and we are
@@ -133,7 +134,7 @@ Thread::CheckOverflow()
 /// NOTE: we disable interrupts, so that we do not get a time slice between
 /// setting `threadToBeDestroyed`, and going to sleep.
 void
-Thread::Finish()
+Thread::Finish(int status)
 {
     interrupt->SetLevel(INT_OFF);
     ASSERT(this == currentThread);
@@ -141,7 +142,7 @@ Thread::Finish()
     DEBUG('t', "Finishing thread \"%s\"\n", getName());
 
     if (isJoineable)
-        joinPort->Send(0); //Waits for father to end
+        joinPort->Send(status); //Waits for father to end
 
     threadToBeDestroyed = currentThread;
     Sleep();  // Invokes `SWITCH`.
@@ -284,7 +285,7 @@ Thread::AddFile(OpenFile *file)
 {
     int i;
 
-    for(i=0; i<MAX_OPEN_FILES; i++){
+    for(i=2; i<MAX_OPEN_FILES; i++){
         if(fileTable[i] == NULL){
             fileTable[i] = file;
             return i;

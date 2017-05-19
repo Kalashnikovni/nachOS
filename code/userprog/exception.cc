@@ -116,13 +116,15 @@ ExceptionHandler(ExceptionType which)
             case SC_Open:
             {
                 int pname = machine->ReadRegister(4);
+		char name[128];
                 //Open the file
-                OpenFile *f = fileSystem->Open((const char*)pname);
+		        ReadStringFromUser(pname, name, 128);
+                OpenFile *f = fileSystem->Open(name);
                 OpenFileId fid = -1;
                 if(f != NULL) {
                     fid = currentThread->AddFile(f);
                     if(fid < 0)
-                        fileSystem->Remove((const char*)pname);
+                        fileSystem->Remove(name);
                 }
                 //Return the fileid
                 machine->WriteRegister(2, fid);
@@ -142,13 +144,34 @@ ExceptionHandler(ExceptionType which)
             }
 
             case SC_Exit:
-            {    break;}
+            {
+		        int status = machine->ReadRegister(4);
+                //TODO: Preguntar sobre OpenFiles
+		        //Terminate the thread
+                currentThread->Finish(status);
+                break;
+            }
 
             case SC_Join:
             {    break;}
 
             case SC_Exec:
-            {    break;}
+            {    
+                int pname = machine->ReadRegister(4);
+                int pargs = machine->ReadRegister(5);
+                char name[128];
+                
+                ReadStringFromUser(pname, name, 128);
+                
+                //All threads will start as joineable
+                Thread *t = new Thread(strdup(name), true);
+                OpenFile *exec = filesystem->Open(name); //FIXME? do a delete of exec?
+                t->space = new AddressSpace(exec);
+                SpaceId tid = /*TODO: newPid*/
+                //TODO: Leer args a kernel (parser)
+                t->Fork(/*TODO: StartProc*/, /*TODO: void *arg*/);
+                break;
+            }
         }
     } else {
         printf("Unexpected user mode exception %d %d\n", which, type);

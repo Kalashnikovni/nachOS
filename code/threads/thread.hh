@@ -120,7 +120,7 @@ public:
     void Sleep();
 
     /// The thread is done executing.
-    void Finish();
+    void Finish(int status = 0);
 
     /// The thread waits for a children.
     void Join();
