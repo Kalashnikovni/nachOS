@@ -153,21 +153,26 @@ ExceptionHandler(ExceptionType which)
             }
 
             case SC_Join:
-            {    break;}
+            {
+                SpaceId pid = machine->ReadRegister(4);
+                Thread *t = /*Todo GetThread(pid)*/
+                /*currentThread needs to wait for t to finish*/
+                /*that is, a call to SC_Exit from t*/
+                break;
+            }
 
             case SC_Exec:
             {    
                 int pname = machine->ReadRegister(4);
                 int pargs = machine->ReadRegister(5);
                 char name[128];
-                
+                //Create a new thread
                 ReadStringFromUser(pname, name, 128);
-                
                 //All threads will start as joineable
                 Thread *t = new Thread(strdup(name), true);
                 OpenFile *exec = filesystem->Open(name); //FIXME? do a delete of exec?
                 t->space = new AddressSpace(exec);
-                SpaceId tid = /*TODO: newPid*/
+                SpaceId pid = /*TODO: NewPid(t)*/
                 //TODO: Leer args a kernel (parser)
                 t->Fork(/*TODO: StartProc*/, /*TODO: void *arg*/);
                 break;
