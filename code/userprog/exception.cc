@@ -116,15 +116,15 @@ ExceptionHandler(ExceptionType which)
             case SC_Open:
             {
                 int pname = machine->ReadRegister(4);
-		char name[128];
+                char name[128];
                 //Open the file
-		        ReadStringFromUser(pname, name, 128);
+    	        ReadStringFromUser(pname, name, 128);
                 OpenFile *f = fileSystem->Open(name);
                 OpenFileId fid = -1;
                 if(f != NULL) {
                     fid = currentThread->AddFile(f);
                     if(fid < 0)
-                        fileSystem->Remove(name);
+                        delete f;
                 }
                 //Return the fileid
                 machine->WriteRegister(2, fid);
@@ -145,9 +145,9 @@ ExceptionHandler(ExceptionType which)
 
             case SC_Exit:
             {
-		        int status = machine->ReadRegister(4);
-                //TODO: Preguntar sobre OpenFiles
-		        //Terminate the thread
+                int status = machine->ReadRegister(4);
+                currentThread->CloseAllFiles();
+                //Terminate the thread
                 currentThread->Finish(status);
                 break;
             }

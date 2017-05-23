@@ -315,6 +315,15 @@ Thread::GetFile(OpenFileId fid)
     return NULL;
 }
 
+///
+void
+Thread::CloseAllFiles()
+{
+    int i;
+    for(i=0; i < MAX_OPEN_FILES; i++)
+        delete fileTable[i];
+}
+
 
 #ifdef USER_PROGRAM
 #include "machine.hh"
