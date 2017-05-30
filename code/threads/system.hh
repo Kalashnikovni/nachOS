@@ -33,6 +33,8 @@ extern Interrupt *interrupt;         ///< Interrupt status.
 extern Statistics *stats;            ///< Performance metrics.
 extern Timer *timer;                 ///< The hardware alarm clock.
 
+extern BitMap *vpages;               ///< Virtual page to physical page translator.
+
 #ifdef USER_PROGRAM
 #include "machine/machine.hh"
 extern Machine* machine;  // User program memory and registers.

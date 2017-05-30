@@ -85,7 +85,7 @@ AddressSpace::AddressSpace(OpenFile *executable)
     for (unsigned i = 0; i < numPages; i++) {
         pageTable[i].virtualPage  = i;
           // For now, virtual page number = physical page number.
-        pageTable[i].physicalPage = i;
+        pageTable[i].physicalPage = vpages->Find(); /*TODO: if find returns -1 (there are no free pages)*/
         pageTable[i].valid        = true;
         pageTable[i].use          = false;
         pageTable[i].dirty        = false;
@@ -96,15 +96,19 @@ AddressSpace::AddressSpace(OpenFile *executable)
 
     // Zero out the entire address space, to zero the unitialized data
     // segment and the stack segment.
-    memset(machine->mainMemory, 0, size);
+    //OLD:memset(machine->mainMemory, 0, size);
+    for (unsigned i = 0; i < numPages; i++) {
+        bzero(&machine->mainMemory[pageTable[i].physicalPage * PAGE_SIZE], PAGE_SIZE);
+    }
 
     // Then, copy in the code and data segments into memory.
-    if (noffH.code.size > 0) {
-        DEBUG('a', "Initializing code segment, at 0x%X, size %u\n",
-              noffH.code.virtualAddr, noffH.code.size);
-        executable->ReadAt(&(machine->mainMemory[noffH.code.virtualAddr]),
-                           noffH.code.size, noffH.code.inFileAddr);
-    }
+    //OLD:if (noffH.code.size > 0) {
+    //    DEBUG('a', "Initializing code segment, at 0x%X, size %u\n",
+    //          noffH.code.virtualAddr, noffH.code.size);
+    //    executable->ReadAt(&(machine->mainMemory[noffH.code.virtualAddr]),
+    //                       noffH.code.size, noffH.code.inFileAddr);
+    //}
+    /*!!!!!!TODO!!!!!!*/
     if (noffH.initData.size > 0) {
         DEBUG('a', "Initializing data segment, at 0x%X, size %u\n",
               noffH.initData.virtualAddr, noffH.initData.size);
@@ -120,6 +124,9 @@ AddressSpace::AddressSpace(OpenFile *executable)
 /// Nothing for now!
 AddressSpace::~AddressSpace()
 {
+    int i;
+    for(i=0; i<numPages; i++)
+        vpages->Clear(pageTable[i].physicalPage);
     delete [] pageTable;
 }
 

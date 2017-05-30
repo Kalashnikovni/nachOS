@@ -22,6 +22,7 @@ Statistics *stats;            ///< Performance metrics.
 Timer *timer;                 ///< The hardware timer device, for invoking
                               ///< context switches.
 
+
 // 2007, Jose Miguel Santos Espino
 PreemptiveScheduler *preemptiveScheduler = NULL;
 const long long DEFAULT_TIME_SLICE = 50000;
@@ -36,6 +37,7 @@ SynchDisk *synchDisk;
 
 #ifdef USER_PROGRAM  // Requires either *FILESYS* or *FILESYS_STUB*.
 Machine *machine;  ///< User program memory and registers.
+BitMap *vpages;               ///< Keep track of translation from vpages to physpages.
 #endif
 
 #ifdef NETWORK
@@ -173,6 +175,7 @@ Initialize(int argc, char **argv)
 
 #ifdef USER_PROGRAM
     machine = new Machine(debugUserProg);  // This must come first.
+    vpages = new BitMap(NUM_PHYS_PAGES);   // Create the translator.
 #endif
 
 #ifdef FILESYS
@@ -203,6 +206,7 @@ Cleanup()
 
 #ifdef USER_PROGRAM
     delete machine;
+    delete vpages;
 #endif
 
 #ifdef FILESYS_NEEDED
