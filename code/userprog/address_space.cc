@@ -108,13 +108,40 @@ AddressSpace::AddressSpace(OpenFile *executable)
     //    executable->ReadAt(&(machine->mainMemory[noffH.code.virtualAddr]),
     //                       noffH.code.size, noffH.code.inFileAddr);
     //}
-    /*!!!!!!TODO!!!!!!*/
+    if (noffH.code.size > 0) {
+        DEBUG(/*TODO*/, "Initializing code segment...");
+        for (unsigned j = 0; j < noffH.code.size; j++){
+            char c;
+            executable->ReadAt(&c, 1, j + noffH.code.inFileAddr);
+            int vaddr  = noffH.code.virtualAddr + j;
+            int vpn    = vaddr / PAGE_SIZE;
+            int offset = vaddr % PAGE_SIZE;
+            int ppn    = pageTable[vpn].physicalPage;
+            int pp     = ppn * PAGE_SIZE;
+            int paddr  = pp + offset;
+            machine->mainMemory[paddr] = c;
+        }
+    }
+    //if (noffH.initData.size > 0) {
+    //    DEBUG('a', "Initializing data segment, at 0x%X, size %u\n",
+    //          noffH.initData.virtualAddr, noffH.initData.size);
+    //    executable->ReadAt(
+    //      &(machine->mainMemory[noffH.initData.virtualAddr]),
+    //      noffH.initData.size, noffH.initData.inFileAddr);
+    //}
     if (noffH.initData.size > 0) {
-        DEBUG('a', "Initializing data segment, at 0x%X, size %u\n",
-              noffH.initData.virtualAddr, noffH.initData.size);
-        executable->ReadAt(
-          &(machine->mainMemory[noffH.initData.virtualAddr]),
-          noffH.initData.size, noffH.initData.inFileAddr);
+        DEBUG(/*TODO*/, "Initializing code segment...");
+        for (unsigned j = 0; j < noffH.initData.size; j++){
+            char c;
+            executable->ReadAt(&c, 1, j + noffH.initData.inFileAddr);
+            int vaddr  = noffH.initData.virtualAddr + j;
+            int vpn    = vaddr / PAGE_SIZE;
+            int offset = vaddr % PAGE_SIZE;
+            int ppn    = pageTable[vpn].physicalPage;
+            int pp     = ppn * PAGE_SIZE;
+            int paddr  = pp + offset;
+            machine->mainMemory[paddr] = c;
+        }
     }
 
 }
