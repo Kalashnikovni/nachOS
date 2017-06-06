@@ -164,6 +164,8 @@ public:
 
     OpenFile *GetFile(OpenFileId fid);
 
+    void CloseAllFiles();
+
 private:
     // Some of the private data for this class is listed above.
 

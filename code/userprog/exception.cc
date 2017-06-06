@@ -155,7 +155,7 @@ ExceptionHandler(ExceptionType which)
             case SC_Join:
             {
                 SpaceId pid = machine->ReadRegister(4);
-                Thread *t = /*Todo GetThread(pid)*/
+                //Thread *t = /*Todo GetThread(pid)*/
                 /*currentThread needs to wait for t to finish*/
                 /*that is, a call to SC_Exit from t*/
                 break;

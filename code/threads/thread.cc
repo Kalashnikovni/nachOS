@@ -321,7 +321,8 @@ Thread::CloseAllFiles()
 {
     int i;
     for(i=0; i < MAX_OPEN_FILES; i++)
-        delete fileTable[i];
+        fileTable[i] = NULL;
+        //delete fileTable[i]; //FIXME
 }
 
 

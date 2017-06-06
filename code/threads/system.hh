@@ -15,6 +15,7 @@
 #include "machine/interrupt.hh"
 #include "machine/statistics.hh"
 #include "machine/timer.hh"
+#include "userprog/bitmap.hh"
 
 
 /// Initialization and cleanup routines.
