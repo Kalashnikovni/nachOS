@@ -315,15 +315,16 @@ Thread::GetFile(OpenFileId fid)
     return NULL;
 }
 
+#ifdef USER_PROGRAM
 ///
 void
 Thread::CloseAllFiles()
 {
     int i;
     for(i=0; i < MAX_OPEN_FILES; i++)
-        fileTable[i] = NULL;
-        //delete fileTable[i]; //FIXME
+       	delete fileTable[i];
 }
+#endif
 
 
 #ifdef USER_PROGRAM

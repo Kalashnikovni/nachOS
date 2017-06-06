@@ -109,8 +109,8 @@ AddressSpace::AddressSpace(OpenFile *executable)
     //                       noffH.code.size, noffH.code.inFileAddr);
     //}
     if (noffH.code.size > 0) {
-        DEBUG(/*TODO*/, "Initializing code segment...");
-        for (unsigned j = 0; j < noffH.code.size; j++){
+        DEBUG('a', "Initializing code segment...");
+        for (int j = 0; j < noffH.code.size; j++){
             char c;
             executable->ReadAt(&c, 1, j + noffH.code.inFileAddr);
             int vaddr  = noffH.code.virtualAddr + j;
@@ -130,8 +130,8 @@ AddressSpace::AddressSpace(OpenFile *executable)
     //      noffH.initData.size, noffH.initData.inFileAddr);
     //}
     if (noffH.initData.size > 0) {
-        DEBUG(/*TODO*/, "Initializing code segment...");
-        for (unsigned j = 0; j < noffH.initData.size; j++){
+        DEBUG('a', "Initializing code segment...");
+        for (int j = 0; j < noffH.initData.size; j++){
             char c;
             executable->ReadAt(&c, 1, j + noffH.initData.inFileAddr);
             int vaddr  = noffH.initData.virtualAddr + j;

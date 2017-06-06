@@ -170,7 +170,7 @@ ExceptionHandler(ExceptionType which)
                 ReadStringFromUser(pname, name, 128);
                 //All threads will start as joineable
                 Thread *t = new Thread(strdup(name), true);
-                OpenFile *exec = filesystem->Open(name); //FIXME? do a delete of exec?
+                OpenFile *exec = fileSystem->Open(name); //FIXME? do a delete of exec?
                 t->space = new AddressSpace(exec);
                 SpaceId pid = /*TODO: NewPid(t)*/
                 //TODO: Leer args a kernel (parser)
