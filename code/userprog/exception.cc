@@ -29,6 +29,7 @@
 #include "iobuffer.hh"
 
 void IncreasePC();
+void StartProc(void *);
 
 /// Entry point into the Nachos kernel.  Called when a user program is
 /// executing, and either does a syscall, or generates an addressing or
@@ -173,8 +174,9 @@ ExceptionHandler(ExceptionType which)
                 OpenFile *exec = fileSystem->Open(name); //FIXME? do a delete of exec?
                 t->space = new AddressSpace(exec);
                 SpaceId pid = /*TODO: NewPid(t)*/
-                //TODO: Leer args a kernel (parser)
-                t->Fork(/*TODO: StartProc*/, /*TODO: void *arg*/);
+                char **args = SaveArgs(pargs);
+                t->Fork(StartProc, args);
+                machine->WriteRegister(2, pid);
                 break;
             }
         }
@@ -196,3 +198,13 @@ IncreasePC()
     machine->WriteRegister(NEXT_PC_REG, pc);
 }
 
+void
+StartProc(void *args)
+{
+    currentThread->space->InitRegisters();
+    currentThread->space->RestoreState();
+
+    WriteArgs((char**) args);
+
+    machine->Run();
+}
