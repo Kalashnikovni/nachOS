@@ -31,6 +31,9 @@ WriteArgs(char **args)
 
     sp -= sp % 4;     // Align the stack to a multiple of four.
     sp -= i * 4 + 4;  // Make room for the array and the trailing NULL.
+    machine->WriteRegister(4, i);
+    machine->WriteRegister(5, sp);
+
     for (unsigned j = 0; j < i; j++)
         // Save the address of the j-th argument counting from the end down
         // to the beginning.
