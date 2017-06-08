@@ -38,6 +38,7 @@ SynchDisk *synchDisk;
 #ifdef USER_PROGRAM  // Requires either *FILESYS* or *FILESYS_STUB*.
 Machine *machine;  ///< User program memory and registers.
 BitMap *vpages;               ///< Keep track of translation from vpages to physpages.
+AddressSpace **ptable;    ///< Keep track of process pid and address space.
 #endif
 
 #ifdef NETWORK

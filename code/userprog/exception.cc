@@ -172,8 +172,9 @@ ExceptionHandler(ExceptionType which)
                 //All threads will start as joineable
                 Thread *t = new Thread(strdup(name), true);
                 OpenFile *exec = fileSystem->Open(name); //FIXME? do a delete of exec?
-                t->space = new AddressSpace(exec);
-                SpaceId pid = /*TODO: NewPid(t)*/
+                AddressSpace *as = new AddressSpace(exec);
+                t->space = as;
+                SpaceId pid = NewPid(t);
                 char **args = SaveArgs(pargs);
                 t->Fork(StartProc, args);
                 machine->WriteRegister(2, pid);
@@ -208,3 +209,6 @@ StartProc(void *args)
 
     machine->Run();
 }
+
+
+/*TODO: Hacer las funciones para AddressSpace **ptable*/
