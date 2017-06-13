@@ -72,7 +72,7 @@ AddressSpace::AddressSpace(OpenFile *executable)
     numPages = divRoundUp(size, PAGE_SIZE);
     size = numPages * PAGE_SIZE;
 
-    ASSERT(numPages <= NUM_PHYS_PAGES);
+    ASSERT(numPages <= NUM_PHYS_PAGES); //FIXME 
       // Check we are not trying to run anything too big -- at least until we
       // have virtual memory.
 
@@ -81,7 +81,7 @@ AddressSpace::AddressSpace(OpenFile *executable)
 
     // First, set up the translation.
 
-    pageTable = new TranslationEntry[numPages];
+    pageTable = new TranslationEntry[numPages]; //FIXME
     for (unsigned i = 0; i < numPages; i++) {
         pageTable[i].virtualPage  = i;
           // For now, virtual page number = physical page number.
@@ -113,7 +113,7 @@ AddressSpace::AddressSpace(OpenFile *executable)
         for (int j = 0; j < noffH.code.size; j++){
             char c;
             executable->ReadAt(&c, 1, j + noffH.code.inFileAddr);
-            int vaddr  = noffH.code.virtualAddr + j;
+            int vaddr  = noffH.code.virtualAddr + j; //FIXME 
             int vpn    = vaddr / PAGE_SIZE;
             int offset = vaddr % PAGE_SIZE;
             int ppn    = pageTable[vpn].physicalPage;
@@ -136,7 +136,7 @@ AddressSpace::AddressSpace(OpenFile *executable)
             executable->ReadAt(&c, 1, j + noffH.initData.inFileAddr);
             int vaddr  = noffH.initData.virtualAddr + j;
             int vpn    = vaddr / PAGE_SIZE;
-            int offset = vaddr % PAGE_SIZE;
+            int offset = vaddr % PAGE_SIZE; //FIXME
             int ppn    = pageTable[vpn].physicalPage;
             int pp     = ppn * PAGE_SIZE;
             int paddr  = pp + offset;
