@@ -4,13 +4,14 @@
 #include "synch_console.hh"
 
 // Constructor. Create instances of lock and console.
-SynchConsole::SynchConsole()
+// Use arguments as NULL to read from stdin and write to stdout
+SynchConsole::SynchConsole(const char *readFile, const char*writeFile)
 {
     readSem = new Semaphore("Console ReadSem", 0);
     wirteSem = new Semaphore("Console WriteSem", 0);
     readlock = new Lock("Console ReadLock");
     writelock = new Lock("Console WriteLock");
-    console = new Console(/*TODO:in*/, /*TODO:out*/, ReadAvail, WriteDone, this);
+    console = new Console(readFile, writeFile, ReadAvail, WriteDone, this);
 }
 
 // Destroyer
