@@ -81,6 +81,7 @@ THREAD_O = main.o        \
 USERPROG_H = ../userprog/address_space.hh \
              ../userprog/bitmap.hh        \
              ../userprog/iobuffer.hh      \
+             ../userprog/synch_console.hh \
              ../filesys/file_system.hh    \
              ../filesys/open_file.hh      \
              ../machine/console.hh        \
@@ -94,6 +95,7 @@ USERPROG_C = ../userprog/address_space.cc \
              ../userprog/bitmap.cc        \
              ../userprog/exception.cc     \
              ../userprog/prog_test.cc     \
+             ../userprog/synch_console.cc \
              ../machine/console.cc        \
              ../machine/debugger.cc       \
              ../machine/encoding.cc       \
@@ -106,6 +108,7 @@ USERPROG_O = address_space.o \
              bitmap.o        \
              exception.o     \
              prog_test.o     \
+             synch_console.o \
              console.o       \
              debugger.o      \
              encoding.o      \
