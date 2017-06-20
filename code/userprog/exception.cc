@@ -181,6 +181,7 @@ ExceptionHandler(ExceptionType which)
                 t->space = as;
                 SpaceId pid = NewPid(t);
                 char **args = SaveArgs(pargs);
+                //StartProc will WriteArgs (leaving r4 and r5 as argc and argv)
                 t->Fork(StartProc, args);
                 machine->WriteRegister(2, pid);
                 break;
