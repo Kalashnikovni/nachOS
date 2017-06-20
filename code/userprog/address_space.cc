@@ -84,8 +84,10 @@ AddressSpace::AddressSpace(OpenFile *executable)
     pageTable = new TranslationEntry[numPages]; //FIXME
     for (unsigned i = 0; i < numPages; i++) {
         pageTable[i].virtualPage  = i;
-          // For now, virtual page number = physical page number.
-        pageTable[i].physicalPage = vpages->Find(); /*TODO: if find returns -1 (there are no free pages)*/
+        //FIXME?: For now, virtual page number = physical page number.
+        pageTable[i].physicalPage = vpages->Find(); 
+	// Check that there were actually free physical pages.
+	ASSERT(pageTable[i].physicalPage > -1);
         pageTable[i].valid        = true;
         pageTable[i].use          = false;
         pageTable[i].dirty        = false;

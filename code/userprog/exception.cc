@@ -159,6 +159,11 @@ ExceptionHandler(ExceptionType which)
                 //Thread *t = /*Todo GetThread(pid)*/
                 /*currentThread needs to wait for t to finish*/
                 /*that is, a call to SC_Exit from t*/
+		//IDEA: implementar como un mutex, que se crea y toma
+                // al momento de crear el thread y se suelta al
+                // momento de hacer un exit. Cuando se quiera hacer
+                // join, se intenta tomar el mutex y hasta que el
+                // proc no haga exit no lo podra tomar :D #nico
                 break;
             }
 
