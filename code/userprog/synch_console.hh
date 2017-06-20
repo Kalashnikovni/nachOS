@@ -10,7 +10,7 @@
 class SynchConsole {
 public:
     // Initialize the raw console and synch mecanisms
-    SynchConsole();
+    SynchConsole(const char *readFile, const char *writeFile);
 
     // De-allocate the console and synch mecanisms
     ~SynchConsole();
@@ -30,6 +30,6 @@ private:
     Semaphore *writeSem;
     Lock *readLock;
     Lock *writeLock;
-}
+};
 
 #endif //SYNCH_CONSOLE_HH

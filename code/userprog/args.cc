@@ -1,4 +1,4 @@
-#include "machine/machine.h"
+#include "machine/machine.hh"
 
 
 const unsigned MAX_ARG_COUNT  = 32;
@@ -18,7 +18,7 @@ WriteArgs(char **args)
     // Start writing the arguments where the current SP points.
     int args_address[MAX_ARG_COUNT];
     unsigned i;
-    int sp = machine->ReadRegister(StackReg);
+    int sp = machine->ReadRegister(STACK_REG);
     for (i = 0; i < MAX_ARG_COUNT; i++) {
         if (args[i] == NULL)        // If the last was reached, terminate.
             break;
@@ -41,7 +41,7 @@ WriteArgs(char **args)
     machine->WriteMem(sp + 4 * i, 4, 0);  // The last is NULL.
     sp -= 16;  // Make room for the “register saves”.
 
-    machine->WriteRegister(StackReg, sp);
+    machine->WriteRegister(STACK_REG, sp);
     delete args;  // Free the array.
 }
 

@@ -16,7 +16,7 @@
 #include "machine/statistics.hh"
 #include "machine/timer.hh"
 #include "userprog/bitmap.hh"
-
+#include "userprog/address_space.hh"
 
 /// Initialization and cleanup routines.
 

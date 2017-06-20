@@ -27,9 +27,12 @@
 #include "filesys/file_system.hh"
 #include "filesys/open_file.hh"
 #include "iobuffer.hh"
+#include "args.cc"
 
 void IncreasePC();
 void StartProc(void *);
+SpaceId NewPid(Thread *);
+void RemovePid(SpaceId);
 
 /// Entry point into the Nachos kernel.  Called when a user program is
 /// executing, and either does a syscall, or generates an addressing or
@@ -179,7 +182,7 @@ ExceptionHandler(ExceptionType which)
                 OpenFile *exec = fileSystem->Open(name); //FIXME? do a delete of exec?
                 AddressSpace *as = new AddressSpace(exec);
                 t->space = as;
-                SpaceId pid = NewPid(t);
+                SpaceId pid = NewPid(t); //TODO: No implementado!
                 char **args = SaveArgs(pargs);
                 //StartProc will WriteArgs (leaving r4 and r5 as argc and argv)
                 t->Fork(StartProc, args);
@@ -218,3 +221,15 @@ StartProc(void *args)
 
 
 /*TODO: Hacer las funciones para AddressSpace **ptable*/
+SpaceId
+NewPid(Thread *t)
+{
+    /*TODO*/
+    return 1; //FIXME
+}
+
+void
+RemovePid(SpaceId p)
+{
+    /*TODO*/
+}

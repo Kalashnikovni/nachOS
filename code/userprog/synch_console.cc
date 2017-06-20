@@ -8,9 +8,9 @@
 SynchConsole::SynchConsole(const char *readFile, const char*writeFile)
 {
     readSem = new Semaphore("Console ReadSem", 0);
-    wirteSem = new Semaphore("Console WriteSem", 0);
-    readlock = new Lock("Console ReadLock");
-    writelock = new Lock("Console WriteLock");
+    writeSem = new Semaphore("Console WriteSem", 0);
+    readLock = new Lock("Console ReadLock");
+    writeLock = new Lock("Console WriteLock");
     console = new Console(readFile, writeFile, ReadAvail, WriteDone, this);
 }
 
@@ -49,16 +49,17 @@ SynchConsole::WriteChar(char c)
 }
 
 
+// FIXME?: cambie de static void a void, esta bien?
 // Function to Console constructor. Character has arrived.
-static void
+void
 SynchConsole::ReadAvail(void *arg)
 {
-    (SynchConsole *)arg->readSem->V();
+    ((SynchConsole *)arg)->readSem->V();
 }
 
 // Function to Console constructor. Write has finished.
-static void
+void
 SynchConsole::WriteDone(void *arg)
 {
-    (SynchConsole *)arg->writeSem->V();
+    ((SynchConsole *)arg)->writeSem->V();
 }
