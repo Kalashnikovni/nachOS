@@ -105,8 +105,8 @@ main(void)
 {
     const OpenFileId INPUT  = ConsoleInput;
     const OpenFileId OUTPUT = ConsoleOutput;
-    char             line[MAX_LINE_SIZE];
-    char            *argv[MAX_ARG_COUNT];
+    char line[MAX_LINE_SIZE];
+    char *argv[MAX_ARG_COUNT];
 
     for (;;) {
         WritePrompt(OUTPUT);
@@ -122,7 +122,7 @@ main(void)
         }
 
         const SpaceId newProc = Exec(line, argv);
-        if(SpaceId < 0){ //FIXME if needed (after implementing pids)
+        if(newProc < 0){ //FIXME if needed (after implementing pids)
             WriteError("error executing the process.", OUTPUT);
         }
 
