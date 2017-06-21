@@ -160,9 +160,10 @@ ExceptionHandler(ExceptionType which)
             {
                 SpaceId pid = machine->ReadRegister(4);
                 //Thread *t = /*Todo GetThread(pid)*/
+                //t->Join(); /TODO ???
                 /*currentThread needs to wait for t to finish*/
                 /*that is, a call to SC_Exit from t*/
-		//IDEA: implementar como un mutex, que se crea y toma
+		        //IDEA: implementar como un mutex, que se crea y toma
                 // al momento de crear el thread y se suelta al
                 // momento de hacer un exit. Cuando se quiera hacer
                 // join, se intenta tomar el mutex y hasta que el
@@ -225,11 +226,18 @@ SpaceId
 NewPid(Thread *t)
 {
     /*TODO*/
-    return 1; //FIXME
+    for(int i = 0; i < 1000; i++) //FIXME: replace 1000 by the correct number
+        if(ptable[i]==NULL){
+            ptable[i] = t->space;
+            return i;
+        }
+
+    return -1; //FIXME
 }
 
 void
 RemovePid(SpaceId p)
 {
     /*TODO*/
+    ptable[p] = NULL;
 }

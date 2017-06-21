@@ -72,7 +72,7 @@ AddressSpace::AddressSpace(OpenFile *executable)
     numPages = divRoundUp(size, PAGE_SIZE);
     size = numPages * PAGE_SIZE;
 
-    ASSERT(numPages <= NUM_PHYS_PAGES); //FIXME 
+    ASSERT(numPages <= NUM_PHYS_PAGES); 
       // Check we are not trying to run anything too big -- at least until we
       // have virtual memory.
 
@@ -81,13 +81,13 @@ AddressSpace::AddressSpace(OpenFile *executable)
 
     // First, set up the translation.
 
-    pageTable = new TranslationEntry[numPages]; //FIXME
+    pageTable = new TranslationEntry[numPages]; 
     for (unsigned i = 0; i < numPages; i++) {
         pageTable[i].virtualPage  = i;
         //FIXME?: For now, virtual page number = physical page number.
         pageTable[i].physicalPage = vpages->Find(); 
-	// Check that there were actually free physical pages.
-	ASSERT(pageTable[i].physicalPage > -1);
+	    // FIXME? No need to check cuz physicalPage is unsigned -> Check that there were actually free physical pages.
+	    //ASSERT(pageTable[i].physicalPage > -1);
         pageTable[i].valid        = true;
         pageTable[i].use          = false;
         pageTable[i].dirty        = false;
@@ -115,7 +115,7 @@ AddressSpace::AddressSpace(OpenFile *executable)
         for (int j = 0; j < noffH.code.size; j++){
             char c;
             executable->ReadAt(&c, 1, j + noffH.code.inFileAddr);
-            int vaddr  = noffH.code.virtualAddr + j; //FIXME 
+            int vaddr  = noffH.code.virtualAddr + j; 
             int vpn    = vaddr / PAGE_SIZE;
             int offset = vaddr % PAGE_SIZE;
             int ppn    = pageTable[vpn].physicalPage;
@@ -138,7 +138,7 @@ AddressSpace::AddressSpace(OpenFile *executable)
             executable->ReadAt(&c, 1, j + noffH.initData.inFileAddr);
             int vaddr  = noffH.initData.virtualAddr + j;
             int vpn    = vaddr / PAGE_SIZE;
-            int offset = vaddr % PAGE_SIZE; //FIXME
+            int offset = vaddr % PAGE_SIZE; 
             int ppn    = pageTable[vpn].physicalPage;
             int pp     = ppn * PAGE_SIZE;
             int paddr  = pp + offset;
