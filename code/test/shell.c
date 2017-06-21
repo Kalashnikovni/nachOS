@@ -1,6 +1,4 @@
 #include "syscall.h"
-#include <stdbool.h>
-
 
 #define MAX_LINE_SIZE  60
 #define MAX_ARG_COUNT  32
@@ -61,7 +59,7 @@ ReadLine(char *buffer, unsigned size, OpenFileId input)
 }
 
 static int
-PrepareArguments(char *line, char **argv, unsigned argvSize, bool *bg)
+PrepareArguments(char *line, char **argv, unsigned argvSize, _Bool *bg)
 {
     // TODO: how to make sure that `line` and `argv` are not `NULL`?, and
     //        for `argvSize`, what precondition should be fulfilled?
@@ -117,7 +115,7 @@ main(void)
             continue;
         }
 
-        bool bg;
+        _Bool bg;
         if (PrepareArguments(line, argv, MAX_ARG_COUNT, &bg) == 0) {
             WriteError("too many arguments.", OUTPUT);
             continue;
