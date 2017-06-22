@@ -35,7 +35,7 @@ extern Statistics *stats;            ///< Performance metrics.
 extern Timer *timer;                 ///< The hardware alarm clock.
 
 extern BitMap *vpages;               ///< Virtual page to physical page translator.
-extern AddressSpace **ptable;         ///< SpaceId table.
+extern Thread **ptable;              ///< SpaceId table.
 
 #ifdef USER_PROGRAM
 #include "machine/machine.hh"

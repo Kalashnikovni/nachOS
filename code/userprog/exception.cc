@@ -159,7 +159,7 @@ ExceptionHandler(ExceptionType which)
             case SC_Join:
             {
                 SpaceId pid = machine->ReadRegister(4);
-                Thread *t = //TODO;
+                Thread *t = ptable[pid];
                 t->Join();
                 break;
             }
@@ -221,7 +221,7 @@ NewPid(Thread *t)
     /*TODO*/
     for(int i = 0; i < 1000; i++) //FIXME: replace 1000 by the correct number
         if(ptable[i]==NULL){
-            ptable[i] = t->space;
+            ptable[i] = t;
             return i;
         }
 
