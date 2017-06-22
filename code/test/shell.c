@@ -127,12 +127,9 @@ main(void)
         }
 
         if(!bg){
-            Join(newProc);
-        // TODO: is it necessary to check for errors after `Join` too, or
-        //        can you be sure that, with the implementation of the system
-        //        call handler you made, it will never give an error?; what
-        //        happens if tomorrow the implementation changes and new
-        //        error conditions appear?
+            if(Join(newProc) < 0){
+                WriteError("join failed or process exited with error.", OUTPUT);
+            }
         }
     }
 
