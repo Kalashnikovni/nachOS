@@ -176,7 +176,8 @@ Initialize(int argc, char **argv)
 
 #ifdef USER_PROGRAM
     machine = new Machine(debugUserProg);  // This must come first.
-    vpages = new BitMap(NUM_PHYS_PAGES);   // Create the translator.
+    vpages  = new BitMap(NUM_PHYS_PAGES);   // Create the translator.
+    ptable  = new Thread * [1000];
 #endif
 
 #ifdef FILESYS

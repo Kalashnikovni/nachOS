@@ -68,13 +68,13 @@ AddressSpace::AddressSpace(OpenFile *executable)
 
     size = noffH.code.size + noffH.initData.size + noffH.uninitData.size
            + USER_STACK_SIZE;
-      // We need to increase the size to leave room for the stack.
+    // We need to increase the size to leave room for the stack.
     numPages = divRoundUp(size, PAGE_SIZE);
     size = numPages * PAGE_SIZE;
 
-    ASSERT(numPages <= NUM_PHYS_PAGES); 
-      // Check we are not trying to run anything too big -- at least until we
-      // have virtual memory.
+    //TODO: se puede borrar esto?ASSERT(numPages <= NUM_PHYS_PAGES); 
+    // Check we are not trying to run anything too big -- at least until we
+    // have virtual memory.
 
     DEBUG('a', "Initializing address space, num pages %u, size %u\n",
           numPages, size);

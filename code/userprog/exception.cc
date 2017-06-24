@@ -161,6 +161,7 @@ ExceptionHandler(ExceptionType which)
                 SpaceId pid = machine->ReadRegister(4);
                 Thread *t = ptable[pid];
                 t->Join();
+                IncreasePC();
                 break;
             }
 
@@ -181,6 +182,7 @@ ExceptionHandler(ExceptionType which)
                 //StartProc will WriteArgs (leaving r4 and r5 as argc and argv)
                 t->Fork(StartProc, args);
                 machine->WriteRegister(2, pid);
+                IncreasePC();
                 break;
             }
         }
