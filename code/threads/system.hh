@@ -17,6 +17,7 @@
 #include "machine/timer.hh"
 #include "userprog/bitmap.hh"
 #include "userprog/address_space.hh"
+#include "userprog/synch_console.hh"
 
 /// Initialization and cleanup routines.
 
@@ -36,6 +37,7 @@ extern Timer *timer;                 ///< The hardware alarm clock.
 
 extern BitMap *vpages;               ///< Virtual page to physical page translator.
 extern Thread **ptable;              ///< SpaceId table.
+extern SynchConsole *sconsole;
 
 #ifdef USER_PROGRAM
 #include "machine/machine.hh"

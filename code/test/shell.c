@@ -40,10 +40,11 @@ WriteError(const char *description, OpenFileId output)
     }
 }
 
-static unsigned
+//Returns -1 if only \n or EOF, or size of the reading if not
+static int
 ReadLine(char *buffer, unsigned size, OpenFileId input)
 {
-    unsigned i;
+    int i;
 
     if(buffer != NULL){
         for (i = 0; i < size-1; i++) {
@@ -67,8 +68,6 @@ PrepareArguments(char *line, char **argv, unsigned argvSize, _Bool *bg)
     // PENDIENTE: use `bool` instead of `int` as return type; for doing this,
     //            given that we are in C and not C++, it is convenient to
     //            include `stdbool.h`.
-    // TODO(nico): chequear que el primer char sea BACKGROUND_RUN y poner
-    // en true o false bg correspondientemente (y borrar el char si esta)
 
     unsigned argCount;
 
@@ -79,12 +78,18 @@ PrepareArguments(char *line, char **argv, unsigned argvSize, _Bool *bg)
     // characters, so as to be able to treat each argument as a standalone
     // string.
     //
-    // TO DO: what happens if there are two consecutive spaces?, and what
-    //        about spaces at the beginning of the line?, and at the end?
-    //
-    // TO DO: what if the user wants to include a space as part of an
+    // TODO: what if the user wants to include a space as part of an
     //        argument?
-    for (unsigned i = 0; line[i] != '\0'; i++)
+    unsigned i = 0;
+    if(line[i] == BACKGROUND_RUN){
+        *bg = 1;
+        i++;
+    }
+    else{
+        *bg = 0;
+    }
+
+    for (; line[i] != '\0'; i++)
         if (line[i] == ARG_SEPARATOR) {
             if (argCount == argvSize - 1)
                 // The maximum of allowed arguments is exceeded, and
@@ -94,6 +99,10 @@ PrepareArguments(char *line, char **argv, unsigned argvSize, _Bool *bg)
             line[i] = '\0';
             argv[argCount] = &line[i + 1];
             argCount++;
+            // Solves case with two or more consecutive spaces
+            while(line[i+1] == ARG_SEPARATOR){
+                i++;
+            }
         }
 
     argv[argCount] = NULL;
@@ -111,7 +120,7 @@ main(void)
     for (;;) {
         WritePrompt(OUTPUT);
         const unsigned lineSize = ReadLine(line, MAX_LINE_SIZE, INPUT);
-        if (lineSize == 0){
+        if (lineSize <= 0){
             continue;
         }
 

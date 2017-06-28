@@ -84,10 +84,9 @@ AddressSpace::AddressSpace(OpenFile *executable)
     pageTable = new TranslationEntry[numPages]; 
     for (unsigned i = 0; i < numPages; i++) {
         pageTable[i].virtualPage  = i;
-        //FIXME?: For now, virtual page number = physical page number.
         pageTable[i].physicalPage = vpages->Find(); 
-	    // FIXME? No need to check cuz physicalPage is unsigned -> Check that there were actually free physical pages.
-	    //ASSERT(pageTable[i].physicalPage > -1);
+        ASSERT(pageTable[i].physicalPage >=0); 
+        DEBUG('j',"Assigning physPage: [%d]%d \n",i ,pageTable[i].physicalPage);
         pageTable[i].valid        = true;
         pageTable[i].use          = false;
         pageTable[i].dirty        = false;
@@ -96,12 +95,17 @@ AddressSpace::AddressSpace(OpenFile *executable)
           // set its pages to be read-only.
     }
 
+    DEBUG('a', "Finished initialization...\n");
+
     // Zero out the entire address space, to zero the unitialized data
     // segment and the stack segment.
     //OLD:memset(machine->mainMemory, 0, size);
     for (unsigned i = 0; i < numPages; i++) {
-        bzero(&machine->mainMemory[pageTable[i].physicalPage * PAGE_SIZE], PAGE_SIZE);
+        DEBUG('j', "Zeroing out [%d]%d \n", i, pageTable[i].physicalPage);
+        bzero(&(machine->mainMemory[pageTable[i].physicalPage * PAGE_SIZE]), PAGE_SIZE);
     }
+
+    DEBUG('a', "Finished zeroing out the pagetable address... \n");
 
     // Then, copy in the code and data segments into memory.
     //OLD:if (noffH.code.size > 0) {
@@ -111,7 +115,7 @@ AddressSpace::AddressSpace(OpenFile *executable)
     //                       noffH.code.size, noffH.code.inFileAddr);
     //}
     if (noffH.code.size > 0) {
-        DEBUG('a', "Initializing code segment...");
+        DEBUG('a', "Initializing code segment...\n");
         for (int j = 0; j < noffH.code.size; j++){
             char c;
             executable->ReadAt(&c, 1, j + noffH.code.inFileAddr);
@@ -132,7 +136,7 @@ AddressSpace::AddressSpace(OpenFile *executable)
     //      noffH.initData.size, noffH.initData.inFileAddr);
     //}
     if (noffH.initData.size > 0) {
-        DEBUG('a', "Initializing code segment...");
+        DEBUG('a', "Initializing data segment...\n");
         for (int j = 0; j < noffH.initData.size; j++){
             char c;
             executable->ReadAt(&c, 1, j + noffH.initData.inFileAddr);

@@ -32,7 +32,7 @@ CPP = $(GCC_DIR)cpp
 INCLUDE_DIRS = -I../userprog -I../threads
 CFLAGS       = -std=c99 -G 0 -c $(INCLUDE_DIRS) -mips1
 
-PROGRAMS = halt shell tiny_shell matmult sort filetest
+PROGRAMS = halt shell tiny_shell matmult sort filetest cat
 
 
 .PHONY: all clean clean-all

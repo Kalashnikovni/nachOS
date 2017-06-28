@@ -39,6 +39,7 @@ SynchDisk *synchDisk;
 Machine *machine;  ///< User program memory and registers.
 BitMap *vpages;               ///< Keep track of translation from vpages to physpages.
 Thread **ptable;    ///< Keep track of process pid and address space.
+SynchConsole *sconsole;
 #endif
 
 #ifdef NETWORK
@@ -178,6 +179,7 @@ Initialize(int argc, char **argv)
     machine = new Machine(debugUserProg);  // This must come first.
     vpages  = new BitMap(NUM_PHYS_PAGES);   // Create the translator.
     ptable  = new Thread * [1000];
+    sconsole = new SynchConsole(NULL,NULL);   // Use default in, out
 #endif
 
 #ifdef FILESYS

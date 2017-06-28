@@ -84,7 +84,17 @@ ExceptionHandler(ExceptionType which)
                 char *mbuf = new char[size];
                 //Obtain file from filesystem
                 int read = -1;
-                if(id >= 0){
+                if(id == ConsoleInput){
+                    unsigned i;
+                    char c;
+                    for(i = 0; i < size; i++){
+                        c = sconsole->ReadChar();
+                        mbuf[i] = c;
+                    }
+                    WriteBufferToUser((const char*)mbuf,pbuf,size);
+                    read = i;
+                }
+                else if(id >= 0){
                     OpenFile *f = currentThread->GetFile(id);
                     if(f != NULL) {
                         //Read the file
@@ -104,12 +114,22 @@ ExceptionHandler(ExceptionType which)
                 int size = machine->ReadRegister(5);
                 OpenFileId id = machine->ReadRegister(6);
                 char *mbuf = new char[size];
-                //Obtain file from filesystem
-                OpenFile *f = currentThread->GetFile(id);
                 int wrote = -1;
-                if(f != NULL) {
+                if(id == ConsoleOutput){
                     ReadBufferFromUser(pbuf,mbuf,size);
-                    wrote = f->Write((const char*)mbuf,size);
+                    unsigned i;  
+                    for(i = 0; i < size; i++){
+                        sconsole->WriteChar(mbuf[i]);
+                    }
+                    wrote = i;
+                }
+                else{
+                    //Obtain file from filesystem
+                    OpenFile *f = currentThread->GetFile(id);
+                    if(f != NULL) {
+                        ReadBufferFromUser(pbuf,mbuf,size);
+                        wrote = f->Write((const char*)mbuf,size);
+                    }
                 }
                 //Return how much was written
                 machine->WriteRegister(2, wrote);
@@ -173,11 +193,11 @@ ExceptionHandler(ExceptionType which)
                 //Create a new thread
                 ReadStringFromUser(pname, name, 128);
                 //All threads will start as joineable
-                Thread *t = new Thread(strdup(name), true);
-                OpenFile *exec = fileSystem->Open(name); //FIXME? do a delete of exec?
+                Thread *t = new Thread(strdup(name), 0, true);
+                OpenFile *exec = fileSystem->Open(name); //TODO? do a delete of exec?
                 AddressSpace *as = new AddressSpace(exec);
                 t->space = as;
-                SpaceId pid = NewPid(t); //TODO: No implementado!
+                SpaceId pid = NewPid(t);
                 char **args = SaveArgs(pargs);
                 //StartProc will WriteArgs (leaving r4 and r5 as argc and argv)
                 t->Fork(StartProc, args);
@@ -216,23 +236,21 @@ StartProc(void *args)
 }
 
 
-/*TODO: Hacer las funciones para AddressSpace **ptable*/
+//Funciones de ptable
 SpaceId
 NewPid(Thread *t)
 {
-    /*TODO*/
     for(int i = 0; i < 1000; i++) //FIXME: replace 1000 by the correct number
         if(ptable[i]==NULL){
             ptable[i] = t;
             return i;
         }
 
-    return -1; //FIXME
+    return -1; 
 }
 
 void
 RemovePid(SpaceId p)
 {
-    /*TODO*/
     ptable[p] = NULL;
 }
