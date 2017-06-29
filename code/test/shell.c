@@ -81,14 +81,13 @@ PrepareArguments(char *line, char **argv, unsigned argvSize, _Bool *bg)
     // TODO: what if the user wants to include a space as part of an
     //        argument?
     unsigned i = 0;
-    if(line[i] == BACKGROUND_RUN){
-        *bg = 1;
-        //line = line + 2 * sizeof(char);
-        i++;
-    }
-    else{
-        *bg = 0;
-    }
+//    if(line[i] == BACKGROUND_RUN){
+//        *bg = 1;
+//        i=2;
+//    }
+//    else{
+//        *bg = 0;
+//    }
 
     for (; line[i] != '\0'; i++)
         if (line[i] == ARG_SEPARATOR) {
@@ -119,7 +118,6 @@ main(void)
     char *argv[MAX_ARG_COUNT];
     char line2[MAX_LINE_SIZE - 2];
 
-    line2 = line + 2 * sizeof(char);
 
     for (;;) {
         WritePrompt(OUTPUT);
@@ -127,15 +125,24 @@ main(void)
         if (lineSize <= 0){
             continue;
         }
-
-        _Bool bg;
-        if (PrepareArguments(line, argv, MAX_ARG_COUNT, &bg) == 0) {
+        
+        char line_;
+        int bg;
+        if (line[0]=='&') {
+            bg = 1;
+            line_ = line + 2*sizeof(char);
+        }
+        else {
+        bg = 0;
+        line_ = line;
+        }
+        if (PrepareArguments(line_, argv, MAX_ARG_COUNT, &bg) == 0) {
             WriteError("too many arguments.", OUTPUT);
             continue;
         }
 
         WriteError(line, OUTPUT);
-        const SpaceId newProc = Exec(line, argv);
+        const SpaceId newProc = Exec(line_, argv);
         if(newProc < 0){ //FIXME if needed (after implementing pids)
             WriteError("error executing the process.", OUTPUT);
         }
