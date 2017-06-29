@@ -83,6 +83,7 @@ PrepareArguments(char *line, char **argv, unsigned argvSize, _Bool *bg)
     unsigned i = 0;
     if(line[i] == BACKGROUND_RUN){
         *bg = 1;
+        //line = line + 2 * sizeof(char);
         i++;
     }
     else{
@@ -116,6 +117,9 @@ main(void)
     const OpenFileId OUTPUT = ConsoleOutput;
     char line[MAX_LINE_SIZE];
     char *argv[MAX_ARG_COUNT];
+    char line2[MAX_LINE_SIZE - 2];
+
+    line2 = line + 2 * sizeof(char);
 
     for (;;) {
         WritePrompt(OUTPUT);
@@ -130,6 +134,7 @@ main(void)
             continue;
         }
 
+        WriteError(line, OUTPUT);
         const SpaceId newProc = Exec(line, argv);
         if(newProc < 0){ //FIXME if needed (after implementing pids)
             WriteError("error executing the process.", OUTPUT);

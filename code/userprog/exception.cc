@@ -78,6 +78,7 @@ ExceptionHandler(ExceptionType which)
 
             case SC_Read:
             {
+                //Pointer to memory location where the desired data is allocated
                 int pbuf = machine->ReadRegister(4);
                 int size = machine->ReadRegister(5);
                 OpenFileId id = machine->ReadRegister(6);
@@ -181,6 +182,7 @@ ExceptionHandler(ExceptionType which)
                 SpaceId pid = machine->ReadRegister(4);
                 Thread *t = ptable[pid];
                 t->Join();
+                machine->WriteRegister(2, 0);
                 IncreasePC();
                 break;
             }
