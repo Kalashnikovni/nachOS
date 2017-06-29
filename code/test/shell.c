@@ -116,42 +116,47 @@ main(void)
     const OpenFileId OUTPUT = ConsoleOutput;
     char line[MAX_LINE_SIZE];
     char *argv[MAX_ARG_COUNT];
-    char line2[MAX_LINE_SIZE - 2];
 
 
     for (;;) {
         WritePrompt(OUTPUT);
+
         const unsigned lineSize = ReadLine(line, MAX_LINE_SIZE, INPUT);
+
         if (lineSize <= 0){
             continue;
         }
         
-        char line_;
+        char *line_;
         int bg;
+
         if (line[0]=='&') {
             bg = 1;
             line_ = line + 2*sizeof(char);
         }
+
         else {
-        bg = 0;
-        line_ = line;
+            bg = 0;
+            line_ = line;
         }
+
         if (PrepareArguments(line_, argv, MAX_ARG_COUNT, &bg) == 0) {
             WriteError("too many arguments.", OUTPUT);
             continue;
         }
 
-        WriteError(line, OUTPUT);
         const SpaceId newProc = Exec(line_, argv);
-        if(newProc < 0){ //FIXME if needed (after implementing pids)
-            WriteError("error executing the process.", OUTPUT);
-        }
-
-        if(!bg){
-            if(Join(newProc) < 0){
-                WriteError("join failed or process exited with error.", OUTPUT);
+        if(newProc > 0){ //FIXME if needed (after implementing pids)
+            if(!bg){
+                if(Join(newProc) < 0){
+                    WriteError("join failed or process exited with error.", OUTPUT);
+                }
             }
         }
+
+        else
+            WriteError("error executing the process.", OUTPUT);
+
     }
 
     return 0;  // Never reached.

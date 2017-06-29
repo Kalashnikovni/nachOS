@@ -195,14 +195,20 @@ ExceptionHandler(ExceptionType which)
                 //Create a new thread
                 ReadStringFromUser(pname, name, 128);
                 //All threads will start as joineable
-                Thread *t = new Thread(strdup(name), 0, true);
+                //Thread *t = new Thread(strdup(name), 0, true);
                 OpenFile *exec = fileSystem->Open(name); //TODO? do a delete of exec?
-                AddressSpace *as = new AddressSpace(exec);
-                t->space = as;
-                SpaceId pid = NewPid(t);
-                char **args = SaveArgs(pargs);
-                //StartProc will WriteArgs (leaving r4 and r5 as argc and argv)
-                t->Fork(StartProc, args);
+                SpaceId pid = -1;
+                if(exec!=NULL){
+                    //ReadStringFromUser(pname, name, 128);
+                    //All threads will start as joineable
+                    Thread *t = new Thread(strdup(name), 0, true);
+                    AddressSpace *as = new AddressSpace(exec);
+                    t->space = as;
+                    pid = NewPid(t);
+                    char **args = SaveArgs(pargs);
+                    //StartProc will WriteArgs (leaving r4 and r5 as argc and argv)
+                    t->Fork(StartProc, args);
+                }
                 machine->WriteRegister(2, pid);
                 IncreasePC();
                 break;

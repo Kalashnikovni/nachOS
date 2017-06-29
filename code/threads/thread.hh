@@ -64,7 +64,7 @@ const unsigned MACHINE_STATE_SIZE = 17;
 /// In words.
 ///
 /// WATCH OUT IF THIS IS NOT BIG ENOUGH!!!!!
-const unsigned STACK_SIZE = 4 * 1024;
+const unsigned STACK_SIZE = 400 * 1024;
 
 
 /// Thread state.
