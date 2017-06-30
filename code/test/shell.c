@@ -96,13 +96,14 @@ PrepareArguments(char *line, char **argv, unsigned argvSize, _Bool *bg)
                 // therefore the size of `argv` is too.  Note that 1 is
                 // decreased in order to leave space for the NULL at the end.
                 return 0;
+
+            // Solves case with two or more consecutive spaces
+            while(line[i+1] == ARG_SEPARATOR)
+                i++;
+
             line[i] = '\0';
             argv[argCount] = &line[i + 1];
             argCount++;
-            // Solves case with two or more consecutive spaces
-            while(line[i+1] == ARG_SEPARATOR){
-                i++;
-            }
         }
 
     argv[argCount] = NULL;

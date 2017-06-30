@@ -248,7 +248,7 @@ StartProc(void *args)
 SpaceId
 NewPid(Thread *t)
 {
-    for(int i = 0; i < 1000; i++) //FIXME: replace 1000 by the correct number
+    for(int i = 1; i < 1000; i++) //FIXME: replace 1000 by the correct number
         if(ptable[i]==NULL){
             ptable[i] = t;
             return i;

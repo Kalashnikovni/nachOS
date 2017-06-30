@@ -13,7 +13,7 @@ WriteArgs(char **args)
 {
     ASSERT(args != NULL);
 
-    DEBUG('e', "Writing command line arguments into child process.\n");
+    DEBUG('e', "Writing command line arguments into child process.\n %s\n");
 
     // Start writing the arguments where the current SP points.
     int args_address[MAX_ARG_COUNT];
