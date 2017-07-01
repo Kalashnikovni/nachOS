@@ -79,7 +79,7 @@ WriteStringToUser(const char *str, int addr)
     for(i=0; str[i] != '\0'; i++){
         WRITEMEM(addr+i, 1, str[i]);
     }
-    WRITEMEM(addr+i+1, 1, '\0');
+    WRITEMEM(addr+i, 1, '\0');
 }
 
 
