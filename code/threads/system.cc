@@ -22,7 +22,6 @@ Statistics *stats;            ///< Performance metrics.
 Timer *timer;                 ///< The hardware timer device, for invoking
                               ///< context switches.
 
-
 // 2007, Jose Miguel Santos Espino
 PreemptiveScheduler *preemptiveScheduler = NULL;
 const long long DEFAULT_TIME_SLICE = 50000;
@@ -178,7 +177,7 @@ Initialize(int argc, char **argv)
 #ifdef USER_PROGRAM
     machine = new Machine(debugUserProg);  // This must come first.
     vpages  = new BitMap(NUM_PHYS_PAGES);   // Create the translator.
-    ptable  = new Thread * [1000];
+    ptable  = new Thread * [MAX_NPROCS];
     sconsole = new SynchConsole(NULL,NULL);   // Use default in, out
 #endif
 

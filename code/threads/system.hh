@@ -8,6 +8,7 @@
 #ifndef NACHOS_THREADS_SYSTEM__HH
 #define NACHOS_THREADS_SYSTEM__HH
 
+#define MAX_NPROCS 1000
 
 #include "utility.hh"
 #include "thread.hh"

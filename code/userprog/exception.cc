@@ -194,12 +194,9 @@ ExceptionHandler(ExceptionType which)
                 char name[128];
                 //Create a new thread
                 ReadStringFromUser(pname, name, 128);
-                //All threads will start as joineable
-                //Thread *t = new Thread(strdup(name), 0, true);
                 OpenFile *exec = fileSystem->Open(name); //TODO? do a delete of exec?
                 SpaceId pid = -1;
                 if(exec!=NULL){
-                    //ReadStringFromUser(pname, name, 128);
                     //All threads will start as joineable
                     Thread *t = new Thread(strdup(name), 0, true);
                     AddressSpace *as = new AddressSpace(exec);
@@ -248,7 +245,7 @@ StartProc(void *args)
 SpaceId
 NewPid(Thread *t)
 {
-    for(int i = 1; i < 1000; i++) //FIXME: replace 1000 by the correct number
+    for(int i = 1; i < MAX_NPROCS; i++) 
         if(ptable[i]==NULL){
             ptable[i] = t;
             return i;
