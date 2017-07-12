@@ -6,11 +6,16 @@
 #include "system.hh"
 #include "iobuffer.hh"
 
-
-// TODO: READMEM(addr, size, val) if (!machine->ReadMem(addr, size, val)) ASSERT(machine->ReadMem(addr, size, val)) 
-// Llamamos dos veces porque en el primer acceso puede haber un TLB miss
-#define READMEM(addr,size,val) ASSERT(machine->ReadMem((unsigned)addr,(unsigned)size,(int*)val))
+#ifndef TLB 
+#define READMEM(addr, size, val) ASSERT(machine->ReadMem((unsigned)addr, (unsigned)size, (int*)val)) 
 #define WRITEMEM(addr,size,val) ASSERT(machine->WriteMem((unsigned)addr,(unsigned)size,(int)val))
+#endif
+
+// Llamamos dos veces porque en el primer acceso puede haber un TLB miss
+#ifdef TLB
+#define READMEM(addr, size, val) if (!machine->ReadMem(addr, size, val)) ASSERT(machine->ReadMem((unsigned)addr, (unsigned)size, (int*)val)) 
+#define WRITEMEM(addr,size,val) if (!machine->WriteMem(addr, size, val)) ASSERT(machine->WriteMem((unsigned)addr,(unsigned)size,(int)val))
+#endif
 
 
 // Read a null terminated string from user mem
