@@ -33,6 +33,7 @@ void IncreasePC();
 void StartProc(void *);
 SpaceId NewPid(Thread *);
 void RemovePid(SpaceId);
+void insertTLB(TranslationEntry entry);
 
 /// Entry point into the Nachos kernel.  Called when a user program is
 /// executing, and either does a syscall, or generates an addressing or
@@ -211,6 +212,17 @@ ExceptionHandler(ExceptionType which)
                 break;
             }
         }
+
+    } else if (which == PAGE_FAULT_EXCEPTION){
+        DEBUG('b', "Page fault exception encountered");
+        int vaddr = machine->registers[BAD_VADDR_REG];
+        int vpn   = vaddr/PAGE_SIZE;
+        if ((vaddr < 0) || (vaddr >= (machine->pageTableSize * PAGE_SIZE))){
+            DEBUG('b', "Page fault exception error in address");
+            /*TODO:direccion no valida!*/
+        }
+        insertTLB(machine->pageTable[vpn]);
+
     } else {
         printf("Unexpected user mode exception %d %d\n", which, type);
         ASSERT(false);
@@ -241,7 +253,7 @@ StartProc(void *args)
 }
 
 
-//Funciones de ptable
+//PTABLE FUNCTIONS
 SpaceId
 NewPid(Thread *t)
 {
@@ -258,4 +270,22 @@ void
 RemovePid(SpaceId p)
 {
     ptable[p] = NULL;
+}
+
+
+//TLB FUNCTIONS
+void
+insertTLB(TranslationEntry entry)
+{
+    int i;
+    for(i = 0; i < TLB_SIZE; i++){
+        if(!machine->tlb[i].valid){
+            machine->tlb[i] = entry;
+            return;
+        }
+    }
+    //if TLB is full (semi-random policy)
+    i = entry.physicalPage % 4;
+    machine->pageTable[machine->tlb[i].virtualPage] = machine->tlb[i];
+    machine->tlb[i] = entry;
 }

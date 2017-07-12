@@ -192,10 +192,15 @@ AddressSpace::InitRegisters()
 
 /// On a context switch, save any machine state, specific to this address
 /// space, that needs saving.
-///
-/// For now, nothing!
 void AddressSpace::SaveState()
-{}
+{
+#ifdef USE_TLB
+    DEBUG('a', "Saving state");
+    int i;
+    for(i = 0; i < TLB_SIZE; i++)
+        pageTable[machine->tlb[i].virtualPage] = machine->tlb[i];
+#endif
+}
 
 /// On a context switch, restore the machine state so that this address space
 /// can run.
@@ -203,6 +208,12 @@ void AddressSpace::SaveState()
 /// For now, tell the machine where to find the page table.
 void AddressSpace::RestoreState()
 {
+#ifdef USE_TLB
+    //FIXME? segun lo que conteste fede
+    int i;
+    for(i = 0; i < TLB_SIZE; i++)
+        machine->tlb[i].valid = false;
+#endif
     machine->pageTable     = pageTable;
     machine->pageTableSize = numPages;
 }
