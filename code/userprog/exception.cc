@@ -221,7 +221,7 @@ ExceptionHandler(ExceptionType which)
             DEBUG('b', "Page fault exception error in address");
             /*TODO:direccion no valida!*/
         }
-        insertTLB(machine->pageTable[vpn]);
+        insertTLB(currentThread->space->bringPage(vpn));
 
     } else {
         printf("Unexpected user mode exception %d %d\n", which, type);
@@ -286,6 +286,6 @@ insertTLB(TranslationEntry entry)
     }
     //if TLB is full (semi-random policy)
     i = entry.physicalPage % 4;
-    machine->pageTable[machine->tlb[i].virtualPage] = machine->tlb[i];
+    currentThread->space->copyPage(i, machine->tlb[i].virtualPage);
     machine->tlb[i] = entry;
 }

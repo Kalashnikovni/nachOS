@@ -321,8 +321,10 @@ void
 Thread::CloseAllFiles()
 {
     int i;
-    for(i=0; i < MAX_OPEN_FILES; i++)
-       	delete fileTable[i];
+    for(i=2; i < MAX_OPEN_FILES; i++){
+        if(fileTable[i] != NULL)
+	    delete fileTable[i];
+    }
 }
 #endif
 

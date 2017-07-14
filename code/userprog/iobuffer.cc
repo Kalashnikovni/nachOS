@@ -6,17 +6,17 @@
 #include "system.hh"
 #include "iobuffer.hh"
 
-#ifndef TLB 
+
+// Llamamos dos veces porque en el primer acceso puede haber un TLB miss
+#ifdef USE_TLB
+#define READMEM(addr, size, val) if (!machine->ReadMem((unsigned)addr, (unsigned)size, (int*)val)) ASSERT(machine->ReadMem((unsigned)addr, (unsigned)size, (int*)val)) 
+#define WRITEMEM(addr,size,val) if (!machine->WriteMem((unsigned)addr, (unsigned)size, (int)val)) ASSERT(machine->WriteMem((unsigned)addr,(unsigned)size,(int)val))
+
+#else
+
 #define READMEM(addr, size, val) ASSERT(machine->ReadMem((unsigned)addr, (unsigned)size, (int*)val)) 
 #define WRITEMEM(addr,size,val) ASSERT(machine->WriteMem((unsigned)addr,(unsigned)size,(int)val))
 #endif
-
-// Llamamos dos veces porque en el primer acceso puede haber un TLB miss
-#ifdef TLB
-#define READMEM(addr, size, val) if (!machine->ReadMem(addr, size, val)) ASSERT(machine->ReadMem((unsigned)addr, (unsigned)size, (int*)val)) 
-#define WRITEMEM(addr,size,val) if (!machine->WriteMem(addr, size, val)) ASSERT(machine->WriteMem((unsigned)addr,(unsigned)size,(int)val))
-#endif
-
 
 // Read a null terminated string from user mem
 // (The address is assumed to be 4 byte aligned)

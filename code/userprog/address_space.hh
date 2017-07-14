@@ -41,6 +41,9 @@ public:
     void SaveState();
     void RestoreState();
 
+    TranslationEntry bringPage(unsigned i);
+    void copyPage(unsigned from, unsigned to);
+
 private:
 
     /// Assume linear page table translation for now!

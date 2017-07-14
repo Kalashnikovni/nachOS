@@ -157,8 +157,8 @@ AddressSpace::AddressSpace(OpenFile *executable)
 /// Nothing for now!
 AddressSpace::~AddressSpace()
 {
-    int i;
-    for(i=0; i<numPages; i++)
+    unsigned i;
+    for(i=0; i < numPages; i++)
         vpages->Clear(pageTable[i].physicalPage);
     delete [] pageTable;
 }
@@ -195,10 +195,12 @@ AddressSpace::InitRegisters()
 void AddressSpace::SaveState()
 {
 #ifdef USE_TLB
-    DEBUG('a', "Saving state");
-    int i;
-    for(i = 0; i < TLB_SIZE; i++)
+    DEBUG('b', "Saving state (TLB)\n");
+    unsigned i;
+    for(i = 0; i < TLB_SIZE; i++){
         pageTable[machine->tlb[i].virtualPage] = machine->tlb[i];
+        machine->tlb[i].valid = false;
+    }
 #endif
 }
 
@@ -209,11 +211,25 @@ void AddressSpace::SaveState()
 void AddressSpace::RestoreState()
 {
 #ifdef USE_TLB
-    //FIXME? segun lo que conteste fede
-    int i;
+    DEBUG('b', "Restoring state (TLB)\n");
+    unsigned i;
     for(i = 0; i < TLB_SIZE; i++)
         machine->tlb[i].valid = false;
-#endif
+#else
     machine->pageTable     = pageTable;
+#endif
     machine->pageTableSize = numPages;
 }
+
+
+TranslationEntry AddressSpace::bringPage(unsigned pos)
+{
+    return pageTable[pos];
+}
+
+
+void AddressSpace::copyPage(unsigned from, unsigned to)
+{
+    pageTable[to] = machine->tlb[from];
+}
+
