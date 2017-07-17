@@ -223,6 +223,10 @@ ExceptionHandler(ExceptionType which)
         }
         insertTLB(currentThread->space->bringPage(vpn));
 
+    } else if (which == READ_ONLY_EXCEPTION){
+        DEBUG('b', "Read only exception encountered \n");
+        currentThread->Finish(1);
+
     } else {
         printf("Unexpected user mode exception %d %d\n", which, type);
         ASSERT(false);
