@@ -175,6 +175,7 @@ ExceptionHandler(ExceptionType which)
                 currentThread->CloseAllFiles();
                 //Terminate the thread
                 currentThread->Finish(status);
+                stats->Print();
                 break;
             }
 

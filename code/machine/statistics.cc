@@ -19,6 +19,7 @@ Statistics::Statistics()
     numDiskReads = numDiskWrites = 0;
     numConsoleCharsRead = numConsoleCharsWritten = 0;
     numPageFaults = numPacketsSent = numPacketsRecvd = 0;
+    numAccesses = numMisses = 0;
 #ifdef DFS_TICKS_FIX
     tickResets = 0;
 #endif
@@ -43,4 +44,8 @@ Statistics::Print()
     printf("Paging: faults %u\n", numPageFaults);
     printf("Network I/O: packets received %u, sent %u\n",
            numPacketsRecvd, numPacketsSent);
+    if(numAccesses > 0)
+        printf("Hit ratio: %f\n", (float)(numAccesses - numMisses) / numAccesses * 100);
+    else
+        printf("No acceses\n");
 }

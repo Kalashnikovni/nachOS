@@ -220,12 +220,15 @@ Machine::Translate(unsigned virtAddr, unsigned *physAddr,
         }
         entry = &pageTable[vpn];
     } else {
+        DEBUG('n', "NumAcceses, NumMisses: %u %u\n", stats->numAccesses, stats->numMisses);
+        stats->numAccesses++;
         for (entry = NULL, i = 0; i < TLB_SIZE; i++)
             if (tlb[i].valid && tlb[i].virtualPage == vpn) {
                 entry = &tlb[i];  // FOUND!
                 break;
             }
         if (entry == NULL) {  // Not found.
+            stats->numMisses++;
             DEBUG('a',
                   "*** no valid TLB entry found for this virtual page!\n");
             return PAGE_FAULT_EXCEPTION;  // Really, this is a TLB fault, the
