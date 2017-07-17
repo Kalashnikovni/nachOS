@@ -214,11 +214,11 @@ ExceptionHandler(ExceptionType which)
         }
 
     } else if (which == PAGE_FAULT_EXCEPTION){
-        DEBUG('b', "Page fault exception encountered");
+        DEBUG('b', "Page fault exception encountered \n");
         int vaddr = machine->registers[BAD_VADDR_REG];
         int vpn   = vaddr/PAGE_SIZE;
         if ((vaddr < 0) || (vaddr >= (machine->pageTableSize * PAGE_SIZE))){
-            DEBUG('b', "Page fault exception error in address");
+            DEBUG('b', "Page fault exception error in address \n");
             /*TODO:direccion no valida!*/
         }
         insertTLB(currentThread->space->bringPage(vpn));
