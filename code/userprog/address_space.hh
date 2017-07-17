@@ -44,6 +44,8 @@ public:
     TranslationEntry bringPage(unsigned i);
     void copyPage(unsigned from, unsigned to);
 
+    bool LoadPage(OpenFile *executable, int vpn);
+
 private:
 
     /// Assume linear page table translation for now!

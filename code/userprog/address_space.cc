@@ -84,10 +84,16 @@ AddressSpace::AddressSpace(OpenFile *executable)
     pageTable = new TranslationEntry[numPages]; 
     for (unsigned i = 0; i < numPages; i++) {
         pageTable[i].virtualPage  = i;
+#ifndef USE_DML //TODO: assign later
         pageTable[i].physicalPage = vpages->Find(); 
+#endif
         ASSERT(pageTable[i].physicalPage >=0); 
         DEBUG('j',"Assigning physPage: [%d]%d \n",i ,pageTable[i].physicalPage);
+#ifdef USE_DML
+        pageTable[i].valid        = false;
+#else
         pageTable[i].valid        = true;
+#endif
         pageTable[i].use          = false;
         pageTable[i].dirty        = false;
         pageTable[i].readOnly     = false;
@@ -97,6 +103,7 @@ AddressSpace::AddressSpace(OpenFile *executable)
 
     DEBUG('a', "Finished initialization...\n");
 
+#ifndef USE_DML
     // Zero out the entire address space, to zero the unitialized data
     // segment and the stack segment.
     //OLD:memset(machine->mainMemory, 0, size);
@@ -149,6 +156,7 @@ AddressSpace::AddressSpace(OpenFile *executable)
             machine->mainMemory[paddr] = c;
         }
     }
+#endif
 
 }
 
