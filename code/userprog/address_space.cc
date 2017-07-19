@@ -17,7 +17,6 @@
 
 
 #include "address_space.hh"
-#include "bin/noff.h"
 #include "threads/system.hh"
 
 
@@ -40,6 +39,45 @@ SwapHeader(NoffHeader *noffH)
     noffH->uninitData.inFileAddr  = WordToHost(noffH->uninitData.inFileAddr);
 }
 
+#ifdef USE_DML
+//Load a single page from the noffH where the address addr is
+void
+AddressSpace::LoadSegment(int vaddr)
+{
+    DEBUG('z',"Loading segment from addr: %u\n",vaddr);
+    Segment segment;
+    if((vaddr >= noffH.code.virtualAddr) && (vaddr <= noffH.code.virtualAddr + noffH.code.size)){ //Code segment
+        segment = noffH.code; printf("code\n");
+    } else if((vaddr >= noffH.initData.virtualAddr) && (vaddr <= noffH.initData.virtualAddr + noffH.initData.size)){ //InitData segment
+        segment = noffH.initData; printf("init\n");
+    } else if((vaddr >= noffH.uninitData.virtualAddr) && (vaddr <= noffH.uninitData.virtualAddr + noffH.uninitData.size)){ //UninitData segment
+        segment = noffH.uninitData; printf("uninit\n");
+    } else {
+        ASSERT(false);
+    }
+
+    int vpn = vaddr / PAGE_SIZE;
+    pageTable[vpn].physicalPage = vpages->Find();
+    DEBUG('z',"Loading page vpn: %d, into the physPage: %d\n",vpn,pageTable[vpn].physicalPage);
+    ASSERT(pageTable[vpn].physicalPage >= 0);
+    for (int j = 0; (j < PAGE_SIZE) && (j < segment.size - vpn*PAGE_SIZE); j++){
+            DEBUG('z',"Reading exec at: %d\n", j+segment.inFileAddr + vpn*PAGE_SIZE);
+            char c;
+            if(segment.inFileAddr != noffH.uninitData.inFileAddr){       //Load the data
+                exec->ReadAt(&c, 1, j + segment.inFileAddr + vpn*PAGE_SIZE);
+            } else {                                //Zero-Out the uninitData
+                c = (char)0;
+            }
+            int ppn    = pageTable[vpn].physicalPage;
+            int pp     = ppn * PAGE_SIZE;
+            int paddr  = pp + j;
+            machine->mainMemory[paddr] = c;
+    }
+    pageTable[vpn].valid = true; //Now that the page is loaded, set it as valid
+}
+#endif
+
+
 /// Create an address space to run a user program.
 ///
 /// Load the program from a file `executable`, and set everything up so that
@@ -55,9 +93,13 @@ SwapHeader(NoffHeader *noffH)
 ///   memory.
 AddressSpace::AddressSpace(OpenFile *executable)
 {
+#ifdef USE_DML
+    exec = executable;
+#else
     NoffHeader noffH;
-    unsigned   size;
+#endif
 
+    unsigned   size;
     executable->ReadAt((char *) &noffH, sizeof noffH, 0);
     if (noffH.noffMagic != NOFFMAGIC &&
           WordToHost(noffH.noffMagic) == NOFFMAGIC)
@@ -65,17 +107,14 @@ AddressSpace::AddressSpace(OpenFile *executable)
     ASSERT(noffH.noffMagic == NOFFMAGIC);
 
     // How big is address space?
-
     size = noffH.code.size + noffH.initData.size + noffH.uninitData.size
            + USER_STACK_SIZE;
     // We need to increase the size to leave room for the stack.
     numPages = divRoundUp(size, PAGE_SIZE);
     size = numPages * PAGE_SIZE;
 
-    //TODO: se puede borrar esto?ASSERT(numPages <= NUM_PHYS_PAGES); 
     // Check we are not trying to run anything too big -- at least until we
     // have virtual memory.
-
     DEBUG('a', "Initializing address space, num pages %u, size %u\n",
           numPages, size);
 
@@ -86,9 +125,9 @@ AddressSpace::AddressSpace(OpenFile *executable)
         pageTable[i].virtualPage  = i;
 #ifndef USE_DML //TODO: assign later
         pageTable[i].physicalPage = vpages->Find(); 
-#endif
         ASSERT(pageTable[i].physicalPage >=0); 
         DEBUG('j',"Assigning physPage: [%d]%d \n",i ,pageTable[i].physicalPage);
+#endif
 #ifdef USE_DML
         pageTable[i].valid        = false;
 #else
@@ -106,7 +145,6 @@ AddressSpace::AddressSpace(OpenFile *executable)
 #ifndef USE_DML
     // Zero out the entire address space, to zero the unitialized data
     // segment and the stack segment.
-    //OLD:memset(machine->mainMemory, 0, size);
     for (unsigned i = 0; i < numPages; i++) {
         DEBUG('j', "Zeroing out [%d]%d \n", i, pageTable[i].physicalPage);
         bzero(&(machine->mainMemory[pageTable[i].physicalPage * PAGE_SIZE]), PAGE_SIZE);
@@ -115,12 +153,6 @@ AddressSpace::AddressSpace(OpenFile *executable)
     DEBUG('a', "Finished zeroing out the pagetable address... \n");
 
     // Then, copy in the code and data segments into memory.
-    //OLD:if (noffH.code.size > 0) {
-    //    DEBUG('a', "Initializing code segment, at 0x%X, size %u\n",
-    //          noffH.code.virtualAddr, noffH.code.size);
-    //    executable->ReadAt(&(machine->mainMemory[noffH.code.virtualAddr]),
-    //                       noffH.code.size, noffH.code.inFileAddr);
-    //}
     if (noffH.code.size > 0) {
         DEBUG('a', "Initializing code segment...\n");
         for (int j = 0; j < noffH.code.size; j++){
@@ -135,13 +167,6 @@ AddressSpace::AddressSpace(OpenFile *executable)
             machine->mainMemory[paddr] = c;
         }
     }
-    //if (noffH.initData.size > 0) {
-    //    DEBUG('a', "Initializing data segment, at 0x%X, size %u\n",
-    //          noffH.initData.virtualAddr, noffH.initData.size);
-    //    executable->ReadAt(
-    //      &(machine->mainMemory[noffH.initData.virtualAddr]),
-    //      noffH.initData.size, noffH.initData.inFileAddr);
-    //}
     if (noffH.initData.size > 0) {
         DEBUG('a', "Initializing data segment...\n");
         for (int j = 0; j < noffH.initData.size; j++){

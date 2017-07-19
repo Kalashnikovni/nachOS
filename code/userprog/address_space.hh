@@ -16,6 +16,7 @@
 
 #include "filesys/file_system.hh"
 #include "machine/translation_entry.hh"
+#include "bin/noff.h"
 
 
 const unsigned USER_STACK_SIZE = 1024;  ///< Increase this as necessary!
@@ -44,7 +45,7 @@ public:
     TranslationEntry bringPage(unsigned i);
     void copyPage(unsigned from, unsigned to);
 
-    bool LoadPage(OpenFile *executable, int vpn);
+    void LoadSegment(int vaddr);
 
 private:
 
@@ -54,7 +55,13 @@ private:
     /// Number of pages in the virtual address space.
     unsigned numPages;
 
+#ifdef USE_DML
+    /// For demand loading
+    OpenFile *exec;
+    NoffHeader noffH;
+#endif
 };
+
 
 
 #endif

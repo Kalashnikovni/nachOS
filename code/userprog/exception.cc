@@ -218,10 +218,14 @@ ExceptionHandler(ExceptionType which)
         DEBUG('b', "Page fault exception encountered \n");
         int vaddr = machine->registers[BAD_VADDR_REG];
         int vpn   = vaddr/PAGE_SIZE;
-        if ((vaddr < 0) || (vaddr >= (machine->pageTableSize * PAGE_SIZE))){
+        if((vaddr < 0) || (vaddr >= (machine->pageTableSize * PAGE_SIZE))){
             DEBUG('b', "Page fault exception error in address \n");
-            /*TODO:direccion no valida!*/
         }
+#ifdef USE_DML
+        if(!currentThread->space->bringPage(vpn).valid){
+            currentThread->space->LoadSegment(vaddr);
+        }
+#endif
         insertTLB(currentThread->space->bringPage(vpn));
 
     } else if (which == READ_ONLY_EXCEPTION){
