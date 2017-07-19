@@ -1,0 +1,95 @@
+[TLB_SIZE == 4]
+
+"
+      $ ./vmem/nachos -x test/shell
+ nacho$ test/halt
+"
+Hit ratio: 91%
+
+"
+      $ ./vmem/nachos -x test/shell
+ nacho$ test/cat test/cat.c
+ nacho$ test/halt
+"
+Hit ratio: 81%
+
+"
+      $ ./vmem/nachos -x test/shell
+ nacho$ test/matmult
+ nacho$ test/halt
+"
+Hit ratio: 92%
+
+"
+      $ ./vmem/nachos -x test/shell
+ nacho$ test/sort
+ nacho$ test/halt
+"
+Hit ratio: 95%
+
+
+
+[TLB_SIZE == 32]
+
+"
+      $ ./vmem/nachos -x test/shell
+ nacho$ test/halt
+"
+Hit ratio: 93%
+
+"
+      $ ./vmem/nachos -x test/shell
+ nacho$ test/cat test/cat.c
+ nacho$ test/halt
+"
+Hit ratio: 86%
+
+"
+      $ ./vmem/nachos -x test/shell
+ nacho$ test/matmult
+ nacho$ test/halt
+"
+Hit ratio: 98%
+
+"
+      $ ./vmem/nachos -x test/shell
+ nacho$ test/sort
+ nacho$ test/halt
+"
+Hit ratio: 99%
+
+
+[TLB_SIZE == 64]
+
+"
+      $ ./vmem/nachos -x test/shell
+ nacho$ test/halt
+"
+Hit ratio: 93%
+
+"
+      $ ./vmem/nachos -x test/shell
+ nacho$ test/cat test/cat.c
+ nacho$ test/halt
+"
+Hit ratio: 86%
+
+"
+      $ ./vmem/nachos -x test/shell
+ nacho$ test/matmult
+ nacho$ test/halt
+"
+Hit ratio: 99%
+
+"
+      $ ./vmem/nachos -x test/shell
+ nacho$ test/sort
+ nacho$ test/halt
+"
+Hit ratio: ~100%
+
+
+Conclusion: Consideramos que una cantidad apropiada de entradas
+en la TLB seria 32 ya que duplicando esta cantidad el hit ratio
+no presenta cambios substanciales en ejecuciones de un unico 
+programa.
