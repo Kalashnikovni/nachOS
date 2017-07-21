@@ -69,7 +69,7 @@ AddressSpace::LoadSegment(int vaddr)
             DEBUG('z',"Reading exec at: %d\n", j+segment.inFileAddr + vpn*PAGE_SIZE);
             char c;
             if(!zeroOut){ // Load the data
-                exec->ReadAt(&c, 1, j + segment.inFileAddr + vpn*PAGE_SIZE);
+                executable->ReadAt(&c, 1, j + segment.inFileAddr + vpn*PAGE_SIZE);
             } else { // Zero-Out the uninitData
                 c = (char)0;
             }
@@ -97,10 +97,11 @@ AddressSpace::LoadSegment(int vaddr)
 ///
 /// * `executable` is the file containing the object code to load into
 ///   memory.
-AddressSpace::AddressSpace(OpenFile *executable)
+AddressSpace::AddressSpace(OpenFile *exec)
 {
 #ifdef USE_DML
-    exec = executable;
+    executable = exec;
+    printf("asdasdsadad\n");
 #else
     NoffHeader noffH;
 #endif

@@ -57,7 +57,7 @@ private:
 
 #ifdef USE_DML
     /// For demand loading
-    OpenFile *exec;
+    OpenFile *executable;
     NoffHeader noffH;
 #endif
 };
