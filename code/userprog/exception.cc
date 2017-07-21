@@ -220,6 +220,7 @@ ExceptionHandler(ExceptionType which)
         int vpn   = vaddr/PAGE_SIZE;
         if((vaddr < 0) || (vaddr >= (machine->pageTableSize * PAGE_SIZE))){
             DEBUG('b', "Page fault exception error in address \n");
+            ASSERT(false);
         }
 #ifdef USE_DML
         if(!currentThread->space->bringPage(vpn).valid){

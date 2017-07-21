@@ -46,12 +46,17 @@ AddressSpace::LoadSegment(int vaddr)
 {
     DEBUG('z',"Loading segment from addr: %u\n",vaddr);
     Segment segment;
+    bool zeroOut = false;
     if((vaddr >= noffH.code.virtualAddr) && (vaddr <= noffH.code.virtualAddr + noffH.code.size)){ //Code segment
-        segment = noffH.code; printf("code\n");
+        segment = noffH.code;
+        DEBUG('z',"Address: [%u] was found to be in code\n");
     } else if((vaddr >= noffH.initData.virtualAddr) && (vaddr <= noffH.initData.virtualAddr + noffH.initData.size)){ //InitData segment
-        segment = noffH.initData; printf("init\n");
+        segment = noffH.initData;
+        DEBUG('z',"Address: [%u] was found to be in initData\n");
     } else if((vaddr >= noffH.uninitData.virtualAddr) && (vaddr <= noffH.uninitData.virtualAddr + noffH.uninitData.size)){ //UninitData segment
-        segment = noffH.uninitData; printf("uninit\n");
+        segment = noffH.uninitData;
+        zeroOut = true;
+        DEBUG('z',"Address: [%u] was found to be in uninitData\n");
     } else {
         ASSERT(false);
     }
@@ -63,14 +68,15 @@ AddressSpace::LoadSegment(int vaddr)
     for (int j = 0; (j < PAGE_SIZE) && (j < segment.size - vpn*PAGE_SIZE); j++){
             DEBUG('z',"Reading exec at: %d\n", j+segment.inFileAddr + vpn*PAGE_SIZE);
             char c;
-            if(segment.inFileAddr != noffH.uninitData.inFileAddr){       //Load the data
+            if(!zeroOut){ // Load the data
                 exec->ReadAt(&c, 1, j + segment.inFileAddr + vpn*PAGE_SIZE);
-            } else {                                //Zero-Out the uninitData
+            } else { // Zero-Out the uninitData
                 c = (char)0;
             }
             int ppn    = pageTable[vpn].physicalPage;
             int pp     = ppn * PAGE_SIZE;
             int paddr  = pp + j;
+            DEBUG('z',"PPN: [%u], PP: [%u], PADDR: [%u]\n", ppn, pp, paddr);
             machine->mainMemory[paddr] = c;
     }
     pageTable[vpn].valid = true; //Now that the page is loaded, set it as valid
