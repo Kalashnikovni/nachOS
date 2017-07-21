@@ -99,12 +99,7 @@ AddressSpace::LoadSegment(int vaddr)
 ///   memory.
 AddressSpace::AddressSpace(OpenFile *exec)
 {
-#ifdef USE_DML
     executable = exec;
-    printf("asdasdsadad\n");
-#else
-    NoffHeader noffH;
-#endif
 
     unsigned   size;
     executable->ReadAt((char *) &noffH, sizeof noffH, 0);

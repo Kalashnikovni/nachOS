@@ -55,11 +55,9 @@ private:
     /// Number of pages in the virtual address space.
     unsigned numPages;
 
-#ifdef USE_DML
     /// For demand loading
     OpenFile *executable;
     NoffHeader noffH;
-#endif
 };
 
 
