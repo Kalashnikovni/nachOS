@@ -60,13 +60,15 @@ AddressSpace::LoadSegment(int vaddr)
     } else {
         ASSERT(false);
     }
+    
+    DEBUG('z',"OpenFile length [%d]\n", executable->Length());
 
     int vpn = vaddr / PAGE_SIZE;
     pageTable[vpn].physicalPage = vpages->Find();
     DEBUG('z',"Loading page vpn: %d, into the physPage: %d\n",vpn,pageTable[vpn].physicalPage);
     ASSERT(pageTable[vpn].physicalPage >= 0);
     for (int j = 0; (j < PAGE_SIZE) && (j < segment.size - vpn*PAGE_SIZE); j++){
-            DEBUG('z',"Reading exec at: %d\n", j+segment.inFileAddr + vpn*PAGE_SIZE);
+            DEBUG('z',"Reading exec at: %d\n", j + segment.inFileAddr + vpn*PAGE_SIZE);
             char c;
             if(!zeroOut){ // Load the data
                 executable->ReadAt(&c, 1, j + segment.inFileAddr + vpn*PAGE_SIZE);
@@ -100,6 +102,7 @@ AddressSpace::LoadSegment(int vaddr)
 AddressSpace::AddressSpace(OpenFile *exec)
 {
     executable = exec;
+    DEBUG('z',"OpenFile lengths [%u] matches [%u]?\n", exec->Length(), executable->Length());
 
     unsigned   size;
     executable->ReadAt((char *) &noffH, sizeof noffH, 0);
