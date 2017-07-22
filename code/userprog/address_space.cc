@@ -53,12 +53,10 @@ AddressSpace::LoadSegment(int vaddr)
     } else if((vaddr >= noffH.initData.virtualAddr) && (vaddr <= noffH.initData.virtualAddr + noffH.initData.size)){ //InitData segment
         segment = noffH.initData;
         DEBUG('z',"Address: [%u] was found to be in initData\n");
-    } else if((vaddr >= noffH.uninitData.virtualAddr) && (vaddr <= noffH.uninitData.virtualAddr + noffH.uninitData.size)){ //UninitData segment
+    } else { //UninitData or stack segment
         segment = noffH.uninitData;
         zeroOut = true;
         DEBUG('z',"Address: [%u] was found to be in uninitData\n");
-    } else {
-        ASSERT(false);
     }
     
     DEBUG('z',"OpenFile length [%d]\n", executable->Length());
