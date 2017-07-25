@@ -49,32 +49,38 @@ AddressSpace::LoadSegment(int vaddr)
     bool zeroOut = false;
     if((vaddr >= noffH.code.virtualAddr) && (vaddr <= noffH.code.virtualAddr + noffH.code.size)){ //Code segment
         segment = noffH.code;
-        DEBUG('z',"Address: [%u] was found to be in code\n");
+        DEBUG('z',"Address: [%u] was found to be in code\n", vaddr);
     } else if((vaddr >= noffH.initData.virtualAddr) && (vaddr <= noffH.initData.virtualAddr + noffH.initData.size)){ //InitData segment
         segment = noffH.initData;
-        DEBUG('z',"Address: [%u] was found to be in initData\n");
+        DEBUG('z',"Address: [%u] was found to be in initData\n", vaddr);
     } else { //UninitData or stack segment
         segment = noffH.uninitData;
         zeroOut = true;
-        DEBUG('z',"Address: [%u] was found to be in uninitData\n");
+        DEBUG('z',"Address: [%u] was found to be in uninitData\n", vaddr);
     }
     
     DEBUG('z',"OpenFile length [%d]\n", executable->Length());
 
     int vpn = vaddr / PAGE_SIZE;
+    int ppn = pageTable[vpn].physicalPage;
+    int pp  = ppn * PAGE_SIZE;
     pageTable[vpn].physicalPage = vpages->Find();
-    DEBUG('z',"Loading page vpn: %d, into the physPage: %d\n",vpn,pageTable[vpn].physicalPage);
+    DEBUG('ñ',"Loading page vpn: %d, into the physPage: %d\n",vpn,pageTable[vpn].physicalPage);
+//    DEBUG('ñ',"Segment size: %d\n",segment.size);
+    DEBUG('ñ',"Out: %d\n", segment.size - vpn*PAGE_SIZE - segment.virtualAddr);
     ASSERT(pageTable[vpn].physicalPage >= 0);
-    for (int j = 0; (j < PAGE_SIZE) && (j < segment.size - vpn*PAGE_SIZE); j++){
-            DEBUG('z',"Reading exec at: %d\n", j + segment.inFileAddr + vpn*PAGE_SIZE);
+    for (int j = 0; (j < (int)PAGE_SIZE) && (j < segment.size - vpn * (int)PAGE_SIZE - segment.virtualAddr); j++){
+            DEBUG('ñ',"j: %d\n", j);
             char c;
             if(!zeroOut){ // Load the data
-                executable->ReadAt(&c, 1, j + segment.inFileAddr + vpn*PAGE_SIZE);
+                int specialaddr = j + segment.inFileAddr + vpn*PAGE_SIZE - segment.virtualAddr;
+                int res = executable->ReadAt(&c, 1, j + segment.inFileAddr + vpn*PAGE_SIZE - segment.virtualAddr);
+                DEBUG('y',"Character read, from: %hhx %d\n", c, specialaddr);
+                ASSERT(res == 1);
             } else { // Zero-Out the uninitData
+                DEBUG('ñ',"Reading exec at - zero out: %d\n", j + segment.inFileAddr + vpn*PAGE_SIZE);
                 c = (char)0;
             }
-            int ppn    = pageTable[vpn].physicalPage;
-            int pp     = ppn * PAGE_SIZE;
             int paddr  = pp + j;
             DEBUG('z',"PPN: [%u], PP: [%u], PADDR: [%u]\n", ppn, pp, paddr);
             machine->mainMemory[paddr] = c;
