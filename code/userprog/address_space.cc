@@ -62,14 +62,12 @@ AddressSpace::LoadSegment(int vaddr)
     DEBUG('z',"OpenFile length [%d]\n", executable->Length());
 
     int vpn = vaddr / PAGE_SIZE;
+    pageTable[vpn].physicalPage = vpages->Find();
+    ASSERT(pageTable[vpn].physicalPage >= 0);
     int ppn = pageTable[vpn].physicalPage;
     int pp  = ppn * PAGE_SIZE;
-    pageTable[vpn].physicalPage = vpages->Find();
-    DEBUG('ñ',"Loading page vpn: %d, into the physPage: %d\n",vpn,pageTable[vpn].physicalPage);
-//    DEBUG('ñ',"Segment size: %d\n",segment.size);
-    DEBUG('ñ',"Out: %d\n", segment.size - vpn*PAGE_SIZE - segment.virtualAddr);
-    ASSERT(pageTable[vpn].physicalPage >= 0);
-    for (int j = 0; (j < (int)PAGE_SIZE) && (j < segment.size - vpn * (int)PAGE_SIZE - segment.virtualAddr); j++){
+
+    for (int j = 0; (j < (int)PAGE_SIZE) && (j < segment.size - (vpn * (int)PAGE_SIZE - segment.virtualAddr)); j++){
             DEBUG('ñ',"j: %d\n", j);
             char c;
             if(!zeroOut){ // Load the data
@@ -85,6 +83,7 @@ AddressSpace::LoadSegment(int vaddr)
             DEBUG('z',"PPN: [%u], PP: [%u], PADDR: [%u]\n", ppn, pp, paddr);
             machine->mainMemory[paddr] = c;
     }
+
     pageTable[vpn].valid = true; //Now that the page is loaded, set it as valid
 }
 #endif
