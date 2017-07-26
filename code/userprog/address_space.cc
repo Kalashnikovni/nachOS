@@ -68,20 +68,21 @@ AddressSpace::LoadSegment(int vaddr)
     int pp  = ppn * PAGE_SIZE;
 
     for (int j = 0; (j < (int)PAGE_SIZE) && (j < segment.size - (vpn * (int)PAGE_SIZE - segment.virtualAddr)); j++){
-            DEBUG('ñ',"j: %d\n", j);
-            char c;
-            if(!zeroOut){ // Load the data
-                int specialaddr = j + segment.inFileAddr + vpn*PAGE_SIZE - segment.virtualAddr;
-                int res = executable->ReadAt(&c, 1, j + segment.inFileAddr + vpn*PAGE_SIZE - segment.virtualAddr);
-                DEBUG('y',"Character read, from: %hhx %d\n", c, specialaddr);
-                ASSERT(res == 1);
-            } else { // Zero-Out the uninitData
-                DEBUG('ñ',"Reading exec at - zero out: %d\n", j + segment.inFileAddr + vpn*PAGE_SIZE);
-                c = (char)0;
-            }
-            int paddr  = pp + j;
-            DEBUG('z',"PPN: [%u], PP: [%u], PADDR: [%u]\n", ppn, pp, paddr);
-            machine->mainMemory[paddr] = c;
+        char c;
+
+        if(!zeroOut){ // Load the data
+            int specialaddr = j + segment.inFileAddr + vpn * PAGE_SIZE - segment.virtualAddr;
+            int res = executable->ReadAt(&c, 1, j + segment.inFileAddr + vpn*PAGE_SIZE - segment.virtualAddr);
+            DEBUG('y',"Character read, from: %hhx %d\n", c, specialaddr);
+            ASSERT(res == 1);
+        } else { // Zero-Out the uninitData
+            DEBUG('ñ',"Reading exec at - zero out: %d\n", j + segment.inFileAddr + vpn*PAGE_SIZE);
+            c = (char)0;
+        }
+
+        int paddr  = pp + j;
+        DEBUG('z',"PPN: [%u], PP: [%u], PADDR: [%u]\n", ppn, pp, paddr);
+        machine->mainMemory[paddr] = c;
     }
 
     pageTable[vpn].valid = true; //Now that the page is loaded, set it as valid
@@ -144,8 +145,8 @@ AddressSpace::AddressSpace(OpenFile *exec)
         pageTable[i].use          = false;
         pageTable[i].dirty        = false;
         pageTable[i].readOnly     = false;
-          // If the code segment was entirely on a separate page, we could
-          // set its pages to be read-only.
+        // If the code segment was entirely on a separate page, we could
+        // set its pages to be read-only.
     }
 
     DEBUG('a', "Finished initialization...\n");
@@ -190,7 +191,6 @@ AddressSpace::AddressSpace(OpenFile *exec)
         }
     }
 #endif
-
 }
 
 /// Deallocate an address space.
@@ -242,7 +242,7 @@ void AddressSpace::SaveState()
     for(i = 0; i < TLB_SIZE; i++){
 	tlb_entry = machine->tlb[i];
 	if(tlb_entry.valid == true){
-            pageTable[machine->tlb[i].virtualPage] = tlb_entry;
+        pageTable[machine->tlb[i].virtualPage] = tlb_entry;
         }
         tlb_entry.valid = false;
     }
