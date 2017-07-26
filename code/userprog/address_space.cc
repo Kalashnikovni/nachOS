@@ -59,29 +59,23 @@ AddressSpace::LoadSegment(int vaddr)
         DEBUG('z',"Address: [%u] was found to be in uninitData\n", vaddr);
     }
     
-    DEBUG('z',"OpenFile length [%d]\n", executable->Length());
-
     int vpn = vaddr / PAGE_SIZE;
     pageTable[vpn].physicalPage = vpages->Find();
     ASSERT(pageTable[vpn].physicalPage >= 0);
     int ppn = pageTable[vpn].physicalPage;
     int pp  = ppn * PAGE_SIZE;
 
-    for (int j = 0; (j < (int)PAGE_SIZE) && (j < segment.size - (vpn * (int)PAGE_SIZE - segment.virtualAddr)); j++){
+    for (int j = 0; (j < (int)PAGE_SIZE) && (j < executable->Length() - vpn * (int)PAGE_SIZE - segment.inFileAddr); j++){
         char c;
 
         if(!zeroOut){ // Load the data
-            int specialaddr = j + segment.inFileAddr + vpn * PAGE_SIZE - segment.virtualAddr;
             int res = executable->ReadAt(&c, 1, j + segment.inFileAddr + vpn*PAGE_SIZE - segment.virtualAddr);
-            DEBUG('y',"Character read, from: %hhx %d\n", c, specialaddr);
             ASSERT(res == 1);
         } else { // Zero-Out the uninitData
-            DEBUG('ñ',"Reading exec at - zero out: %d\n", j + segment.inFileAddr + vpn*PAGE_SIZE);
             c = (char)0;
         }
 
         int paddr  = pp + j;
-        DEBUG('z',"PPN: [%u], PP: [%u], PADDR: [%u]\n", ppn, pp, paddr);
         machine->mainMemory[paddr] = c;
     }
 
@@ -106,7 +100,6 @@ AddressSpace::LoadSegment(int vaddr)
 AddressSpace::AddressSpace(OpenFile *exec)
 {
     executable = exec;
-    DEBUG('z',"OpenFile lengths [%u] matches [%u]?\n", exec->Length(), executable->Length());
 
     unsigned   size;
     executable->ReadAt((char *) &noffH, sizeof noffH, 0);
