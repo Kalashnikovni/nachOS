@@ -227,6 +227,13 @@ ExceptionHandler(ExceptionType which)
             currentThread->space->LoadSegment(vaddr);
         }
 #endif
+#ifdef USE_SWAP
+        if(currentThread->space->bringPage(vpn).physicalPage == -2){
+            coremap->/*TODO: agregar a thread->system*/
+            currentThread->space->LoadFromSwap(vpn); /*TODO*/
+            /*TODO: leer de carpeta*/
+        }
+#endif
         insertTLB(currentThread->space->bringPage(vpn));
 
     } else if (which == READ_ONLY_EXCEPTION){

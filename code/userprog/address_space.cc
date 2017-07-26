@@ -83,6 +83,34 @@ AddressSpace::LoadSegment(int vaddr)
 }
 #endif
 
+#ifdef USE_SWAP
+// Write a page to SWAP
+void
+AddressSpace::SaveToSwap(int vpn)
+{
+    int ppn = pageTable[vpn].physicalPage;
+    swapfile->WriteAt(&machine->mainMemory[ppn * PAGE_SIZE], PAGE_SIZE, vpn * PAGE_SIZE);
+    /*Invalidar la entrada TLB si es el mismo proceso*/
+#ifdef USE_TLB
+    if(this == currentThread->space){
+        for (int i = 0; i < TLB_SIZE; i++){
+            if (machine->tlb[i].valid && machine->tlb[i].virtualPage == vpn) {
+                pageTable[machine->tlb[i].virtualPage] = machine->tlb[i];
+                machine->tlb[i].valid = false;
+            }
+        }
+    }
+#endif
+    pageTable[vpn].physicalPage = -2;
+}
+
+// Load a page from SWAP
+void
+AddressSpace::LoadFromSwap(int vpn)
+{
+    /*TODO*/
+}
+#endif
 
 /// Create an address space to run a user program.
 ///
@@ -119,6 +147,20 @@ AddressSpace::AddressSpace(OpenFile *exec)
     // have virtual memory.
     DEBUG('a', "Initializing address space, num pages %u, size %u\n",
           numPages, size);
+
+#ifdef USE_SWAP
+    //Create the SWAP file
+    int j;
+    for(j = 0; j < MAX_NPROCS; j++){
+        if(currentThread == ptable[j])
+            break;
+    }
+    ASSERT(ptable[j] == currentThread);
+    char sname[5 + (int)(log10(j) + 1) + 1];
+    sprintf(sname, "SWAP.%d", j);
+    ASSERT(fileSystem->Create(sname, size));
+    swapfile = fileSystem->Open(sname);
+#ifdef USE_SWAP
 
     // First, set up the translation.
 

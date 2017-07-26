@@ -17,6 +17,7 @@
 #include "filesys/file_system.hh"
 #include "machine/translation_entry.hh"
 #include "bin/noff.h"
+#include <math.h>
 
 
 const unsigned USER_STACK_SIZE = 1024;  ///< Increase this as necessary!
@@ -47,6 +48,8 @@ public:
 
     void LoadSegment(int vaddr);
 
+    void SaveToSwap(int vpn);
+
 private:
 
     /// Assume linear page table translation for now!
@@ -58,6 +61,9 @@ private:
     /// For demand loading
     OpenFile *executable;
     NoffHeader noffH;
+
+    // SWAP
+    OpenFile *swapfile;
 };
 
 
