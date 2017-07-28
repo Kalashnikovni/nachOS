@@ -101,14 +101,17 @@ AddressSpace::SaveToSwap(int vpn)
         }
     }
 #endif
+    pageTable[vpn].valid = false;
     pageTable[vpn].physicalPage = -2;
 }
 
 // Load a page from SWAP
 void
-AddressSpace::LoadFromSwap(int vpn)
+AddressSpace::LoadFromSwap(int vpn, int ppn)
 {
-    /*TODO*/
+    swapfile->ReadAt(&machine->mainMemory[ppn * PAGE_SIZE], PAGE_SIZE,vpn * page_size);
+    pageTable[vpn].physicalPage = ppn;
+    pageTable[vpn].valid = true;
 }
 #endif
 
@@ -160,21 +163,20 @@ AddressSpace::AddressSpace(OpenFile *exec)
     sprintf(sname, "SWAP.%d", j);
     ASSERT(fileSystem->Create(sname, size));
     swapfile = fileSystem->Open(sname);
-#ifdef USE_SWAP
+#endif
 
     // First, set up the translation.
 
     pageTable = new TranslationEntry[numPages]; 
     for (unsigned i = 0; i < numPages; i++) {
         pageTable[i].virtualPage  = i;
-#ifndef USE_DML //TODO: assign later
+#ifdef USE_DML
+        pageTable[i].physicalPage = -1;
+        pageTable[i].valid        = false;
+#else
         pageTable[i].physicalPage = vpages->Find(); 
         ASSERT(pageTable[i].physicalPage >=0); 
         DEBUG('j',"Assigning physPage: [%d]%d \n",i ,pageTable[i].physicalPage);
-#endif
-#ifdef USE_DML
-        pageTable[i].valid        = false;
-#else
         pageTable[i].valid        = true;
 #endif
         pageTable[i].use          = false;
@@ -291,14 +293,14 @@ void AddressSpace::SaveState()
 void AddressSpace::RestoreState()
 {
 #ifdef USE_TLB
-    DEBUG('b', "Restoring state (TLB)\n");
-    unsigned i;
-    for(i = 0; i < TLB_SIZE; i++)
-        machine->tlb[i].valid = false;
+DEBUG('b', "Restoring state (TLB)\n");
+unsigned i;
+for(i = 0; i < TLB_SIZE; i++)
+    machine->tlb[i].valid = false;
 #else
-    machine->pageTable     = pageTable;
+machine->pageTable     = pageTable;
 #endif
-    machine->pageTableSize = numPages;
+machine->pageTableSize = numPages;
 }
 
 

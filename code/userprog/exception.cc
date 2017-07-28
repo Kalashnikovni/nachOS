@@ -223,14 +223,16 @@ ExceptionHandler(ExceptionType which)
             ASSERT(false);
         }
 #ifdef USE_DML
-        if(!currentThread->space->bringPage(vpn).valid){
+        if(currentThread->space->bringPage(vpn).physicalPage == -1){
             currentThread->space->LoadSegment(vaddr);
         }
 #endif
 #ifdef USE_SWAP
+        //If its on SWAP, load it
         if(currentThread->space->bringPage(vpn).physicalPage == -2){
-            coremap->/*TODO: agregar a thread->system*/
-            currentThread->space->LoadFromSwap(vpn); /*TODO*/
+            //Find a position and store info in coremap
+            int ppn = coremap->Find(currentThread->space, vpn);
+            currentThread->space->LoadFromSwap(vpn,ppn);
             /*TODO: leer de carpeta*/
         }
 #endif

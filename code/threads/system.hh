@@ -19,6 +19,7 @@
 #include "userprog/bitmap.hh"
 #include "userprog/address_space.hh"
 #include "userprog/synch_console.hh"
+#include "userprog/coremap.hh"
 
 /// Initialization and cleanup routines.
 
@@ -60,5 +61,8 @@ extern SynchDisk *synchDisk;
 extern PostOffice *postOffice;
 #endif
 
+#ifdef USE_SWAP
+extern Coremap *coremap;
+#endif
 
 #endif

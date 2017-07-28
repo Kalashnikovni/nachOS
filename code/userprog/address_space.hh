@@ -49,6 +49,7 @@ public:
     void LoadSegment(int vaddr);
 
     void SaveToSwap(int vpn);
+    void LoadFromSwap(int vpn, int ppn);
 
 private:
 
