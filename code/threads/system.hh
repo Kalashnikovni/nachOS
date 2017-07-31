@@ -20,10 +20,6 @@
 #include "userprog/address_space.hh"
 #include "userprog/synch_console.hh"
 
-#ifdef USE_SWAP
-#include "vmem/coremap.hh"
-#endif
-
 /// Initialization and cleanup routines.
 
 // Initialization, called before anything else.
@@ -65,6 +61,7 @@ extern PostOffice *postOffice;
 #endif
 
 #ifdef USE_SWAP
+#include "vmem/coremap.hh"
 extern Coremap *coremap;
 #endif
 

@@ -45,6 +45,10 @@ SynchConsole *sconsole;
 PostOffice *postOffice;
 #endif
 
+#ifdef USE_SWAP
+Coremap *coremap;
+#endif
+
 // External definition, to allow us to take a pointer to this function.
 extern void Cleanup();
 
