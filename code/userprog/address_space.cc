@@ -159,7 +159,7 @@ AddressSpace::AddressSpace(OpenFile *exec)
             break;
     }
     ASSERT(ptable[j] == currentThread);
-    char sname[5 + (int)(log10(j) + 1) + 1];
+    char sname[128];//5 + (int)(log10(j) + 1) + 1];
     sprintf(sname, "SWAP.%d", j);
     ASSERT(fileSystem->Create(sname, size)); //TODO: DELETE
     swapfile = fileSystem->Open(sname);

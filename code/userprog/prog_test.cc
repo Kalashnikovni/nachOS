@@ -28,10 +28,10 @@ StartProcess(const char *filename)
         printf("Unable to open file %s\n", filename);
         return;
     }
+    ptable[0] = currentThread;
     space = new AddressSpace(executable);
     currentThread->space = space;
 
-    ptable[0] = currentThread;
     //delete executable;
 
     space->InitRegisters();  // Set the initial register values.
