@@ -227,7 +227,7 @@ ExceptionHandler(ExceptionType which)
             currentThread->space->LoadSegment(vaddr);
         }
 #endif
-#ifdef USE_SWAP
+#ifdef VMEM
         //If its on SWAP, load it
         if(currentThread->space->bringPage(vpn).physicalPage == -2){
             //Find a position and store info in coremap

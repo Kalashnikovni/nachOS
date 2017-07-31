@@ -45,7 +45,7 @@ SynchConsole *sconsole;
 PostOffice *postOffice;
 #endif
 
-#ifdef USE_SWAP
+#ifdef VMEM
 Coremap *coremap;
 #endif
 
@@ -197,7 +197,7 @@ Initialize(int argc, char **argv)
     postOffice = new PostOffice(netname, rely, 10);
 #endif
 
-#ifdef USE_SWAP
+#ifdef VMEM
     coremap = new Coremap(NUM_PHYS_PAGES);
 #endif
 }
@@ -228,7 +228,7 @@ Cleanup()
     delete synchDisk;
 #endif
 
-#ifdef USE_SWAP
+#ifdef VMEM
     delete coremap;
 #endif
 

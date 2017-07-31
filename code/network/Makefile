@@ -11,7 +11,7 @@
 # limitation of liability and disclaimer of warranty provisions.
 
 
-DEFINES      = -DUSER_PROGRAM -DVMEM -DFILESYS_NEEDED -DFILESYS -DNETWORK -DUSE_SWAP
+DEFINES      = -DUSER_PROGRAM -DVMEM -DFILESYS_NEEDED -DFILESYS -DNETWORK
 INCLUDE_DIRS = -I.. -I../bin -I../filesys -I../vm -I../userprog \
                -I../threads -I../machine
 HFILES       = $(THREAD_H) $(USERPROG_H) $(VMEM_H) $(FILESYS_H) $(NETWORK_H)

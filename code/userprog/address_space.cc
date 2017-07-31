@@ -83,7 +83,7 @@ AddressSpace::LoadSegment(int vaddr)
 }
 #endif
 
-#ifdef USE_SWAP
+#ifdef VMEM
 // Write a page to SWAP
 void
 AddressSpace::SaveToSwap(int vpn)
@@ -151,7 +151,7 @@ AddressSpace::AddressSpace(OpenFile *exec)
     DEBUG('a', "Initializing address space, num pages %u, size %u\n",
           numPages, size);
 
-#ifdef USE_SWAP
+#ifdef VMEM
     //Create the SWAP file
     int j;
     for(j = 0; j < MAX_NPROCS; j++){

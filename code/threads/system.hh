@@ -60,7 +60,7 @@ extern SynchDisk *synchDisk;
 extern PostOffice *postOffice;
 #endif
 
-#ifdef USE_SWAP
+#ifdef VMEM
 #include "vmem/coremap.hh"
 extern Coremap *coremap;
 #endif
