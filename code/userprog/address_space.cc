@@ -109,7 +109,7 @@ AddressSpace::SaveToSwap(int vpn)
 void
 AddressSpace::LoadFromSwap(int vpn, int ppn)
 {
-    swapfile->ReadAt(&machine->mainMemory[ppn * PAGE_SIZE], PAGE_SIZE,vpn * page_size);
+    swapfile->ReadAt(&machine->mainMemory[ppn * PAGE_SIZE], PAGE_SIZE, vpn * PAGE_SIZE);
     pageTable[vpn].physicalPage = ppn;
     pageTable[vpn].valid = true;
 }

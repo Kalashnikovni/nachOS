@@ -19,7 +19,10 @@
 #include "userprog/bitmap.hh"
 #include "userprog/address_space.hh"
 #include "userprog/synch_console.hh"
-#include "userprog/coremap.hh"
+
+#ifdef USE_SWAP
+#include "vmem/coremap.hh"
+#endif
 
 /// Initialization and cleanup routines.
 

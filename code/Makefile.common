@@ -80,7 +80,6 @@ THREAD_O = main.o        \
 
 USERPROG_H = ../userprog/address_space.hh \
              ../userprog/bitmap.hh        \
-             ../userprog/coremap.hh       \
              ../userprog/iobuffer.hh      \
              ../userprog/synch_console.hh \
              ../filesys/file_system.hh    \
@@ -94,7 +93,6 @@ USERPROG_H = ../userprog/address_space.hh \
 USERPROG_C = ../userprog/address_space.cc \
              ../userprog/iobuffer.cc      \
              ../userprog/bitmap.cc        \
-             ../userprog/coremap.cc       \
              ../userprog/exception.cc     \
              ../userprog/prog_test.cc     \
              ../userprog/synch_console.cc \
@@ -108,7 +106,6 @@ USERPROG_C = ../userprog/address_space.cc \
 USERPROG_O = address_space.o \
              iobuffer.o      \
              bitmap.o        \
-             coremap.o       \
              exception.o     \
              prog_test.o     \
              synch_console.o \
@@ -120,9 +117,9 @@ USERPROG_O = address_space.o \
              mips_sim.o      \
              translate.o     
 
-VMEM_H =
-VMEM_C =
-VMEM_O =
+VMEM_H = ../vmem/coremap.hh
+VMEM_C = ../vmem/coremap.cc
+VMEM_O = coremap.o
 
 FILESYS_H = ../filesys/directory.hh   \
             ../filesys/file_header.hh \
