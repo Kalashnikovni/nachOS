@@ -201,9 +201,9 @@ ExceptionHandler(ExceptionType which)
                 if(exec!=NULL){
                     //All threads will start as joineable
                     Thread *t = new Thread(strdup(name), 0, true);
+                    pid = NewPid(t);
                     AddressSpace *as = new AddressSpace(exec);
                     t->space = as;
-                    pid = NewPid(t);
                     char **args = SaveArgs(pargs);
                     //StartProc will WriteArgs (leaving r4 and r5 as argc and argv)
                     t->Fork(StartProc, args);
