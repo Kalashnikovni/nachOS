@@ -193,7 +193,7 @@ private:
 
     int originalPriority;
 
-    OpenFile *fileTable[MAX_OPEN_FILES];
+    OpenFile *fileTable[MAX_OPEN_FILES] = {};
 
 #ifdef USER_PROGRAM
     /// User-level CPU register state.
