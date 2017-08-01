@@ -51,6 +51,8 @@ public:
     void SaveToSwap(int vpn);
     void LoadFromSwap(int vpn, int ppn);
 
+    int getNumPages();
+
 private:
 
     /// Assume linear page table translation for now!

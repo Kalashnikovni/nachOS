@@ -63,6 +63,7 @@ extern PostOffice *postOffice;
 #ifdef VMEM
 #include "vmem/coremap.hh"
 extern Coremap *coremap;
+extern int victimList[NUM_PHYS_PAGES]; 
 #endif
 
 #endif

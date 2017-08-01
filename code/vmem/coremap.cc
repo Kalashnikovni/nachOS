@@ -24,9 +24,19 @@ Coremap::Find(AddressSpace *own, int vpn)
     return free;
 }
 
+// LRU policy
 int
+Coremap::SelectVictim()
+{
+    int max;
+    for(int i; i < NUM_PHYS_PAGES; i++)
+
+}
+
+// FIFO policy
+/*int
 Coremap::SelectVictim()
 {
     nextVictim = ++nextVictim % nitems;
     return nextVictim;
-}
+}*/

@@ -3,9 +3,9 @@
 #ifndef _COREMAP_HH_
 #define _COREMAP_HH_
 
-#include "address_space.hh"
+#include "userprog/address_space.hh"
 #include "machine.hh"
-#include "bitmap.hh"
+#include "userprog/bitmap.hh"
 
 class Coremap: public BitMap
 {

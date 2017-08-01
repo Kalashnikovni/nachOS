@@ -251,10 +251,13 @@ Machine::Translate(unsigned virtAddr, unsigned *physAddr,
         return BUS_ERROR_EXCEPTION;
     }
     entry->use = true;  // Set the `use`, `dirty` bits.
-    if (writing)
+    if (writing) {
         entry->dirty = true;
+    }
     *physAddr = pageFrame * PAGE_SIZE + offset;
     ASSERT(*physAddr >= 0 && *physAddr + size <= MEMORY_SIZE);
+    // Update age of physical page
+    victimList[pageFrame] = 1;
     DEBUG('a', "phys addr = 0x%X\n", *physAddr);
     return NO_EXCEPTION;
 }

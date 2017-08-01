@@ -15,10 +15,8 @@
 /// All rights reserved.  See `copyright.h` for copyright notice and
 /// limitation of liability and disclaimer of warranty provisions.
 
-
-#include "address_space.hh"
 #include "threads/system.hh"
-
+#include "vmem/coremap.hh"
 
 /// Do little endian to big endian conversion on the bytes in the object file
 /// header, in case the file was generated on a little endian machine, and we
@@ -61,6 +59,9 @@ AddressSpace::LoadSegment(int vaddr)
     
     int vpn = vaddr / PAGE_SIZE;
     pageTable[vpn].physicalPage = vpages->Find();
+#ifdef VMEM
+    pageTable[vpn].physicalPage = coremap->Find(currentThread->space, vpn);
+#endif
     ASSERT(pageTable[vpn].physicalPage >= 0);
     int ppn = pageTable[vpn].physicalPage;
     int pp  = ppn * PAGE_SIZE;
@@ -313,5 +314,10 @@ TranslationEntry AddressSpace::bringPage(unsigned pos)
 void AddressSpace::copyPage(unsigned from, unsigned to)
 {
     pageTable[to] = machine->tlb[from];
+}
+
+int AddressSpace::getNumPages()
+{
+    return numPages;
 }
 

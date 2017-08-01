@@ -199,6 +199,7 @@ Initialize(int argc, char **argv)
 
 #ifdef VMEM
     coremap = new Coremap(NUM_PHYS_PAGES);
+    victimList =
 #endif
 }
 
