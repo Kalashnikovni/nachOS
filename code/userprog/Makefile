@@ -12,7 +12,7 @@
 
 
 DEFINES      = -DUSER_PROGRAM -DFILESYS_NEEDED -DFILESYS_STUB \
-               -DDFS_TICKS_FIX
+               -DDFS_TICKS_FIX -DVMEM
 INCLUDE_DIRS = -I.. -I../bin -I../filesys -I../threads -I../machine
 HFILES       = $(THREAD_H) $(USERPROG_H)
 CFILES       = $(THREAD_C) $(USERPROG_C)

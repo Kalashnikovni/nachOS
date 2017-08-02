@@ -14,6 +14,8 @@
 #define NACHOS_USERPROG_ADDRSPACE__HH
 
 
+#include "threads/system.hh"
+#include "vmem/coremap.hh"
 #include "filesys/file_system.hh"
 #include "machine/translation_entry.hh"
 #include "bin/noff.h"

@@ -4,8 +4,8 @@
 #define _COREMAP_HH_
 
 #include "userprog/address_space.hh"
-#include "machine.hh"
 #include "userprog/bitmap.hh"
+#include "machine.hh"
 
 typedef struct pair {                                     
     int used;
@@ -16,7 +16,7 @@ class Coremap: public BitMap
 {
 public:
     Coremap(int n);
-    int Find(AddressSpace* addr, int i);
+    int Find(AddressSpace *addr, int i);
     void setUsed(int page);
     void setDirty(int page);    
 private:
