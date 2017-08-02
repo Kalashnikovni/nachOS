@@ -20,7 +20,7 @@
 #define NACHOS_FILESYS_OPENFILE__HH
 
 
-#include "threads/utility.hh"
+#include "utility.hh"
 
 
 #ifdef FILESYS_STUB  // Temporarily implement calls to Nachos file system as

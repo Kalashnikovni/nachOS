@@ -11,7 +11,8 @@
 
 
 DEFINES      = -DTHREADS -DDFS_TICKS_FIX
-INCLUDE_DIRS = -I.. -I../machine -I../filesys -I../userprog
+INCLUDE_DIRS = -I.. -I../machine -I../filesys -I../userprog -I../threads \
+			   -I../bin -I../vmem
 HFILES       = $(THREAD_H)
 CFILES       = $(THREAD_C)
 C_OFILES     = $(THREAD_O)

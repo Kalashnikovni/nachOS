@@ -13,8 +13,8 @@
 # All rights reserved.  See `copyright.h` for copyright notice and
 # limitation of liability and disclaimer of warranty provisions.
 
-DEFINES      = -DUSER_PROGRAM  -DFILESYS_NEEDED -DFILESYS_STUB -DVMEM \
-               -DUSE_TLB -DDFS_TICKS_FIX -DCLOCK
+DEFINES      = -DUSER_PROGRAM -DFILESYS_NEEDED -DFILESYS_STUB -DVMEM \
+               -DUSE_TLB -DDFS_TICKS_FIX -DCLOCK -DUSE_DML
 INCLUDE_DIRS = -I../filesys -I../bin -I../vmem -I../userprog -I../threads \
                -I../machine
 HFILES       = $(THREAD_H) $(USERPROG_H) $(VMEM_H)

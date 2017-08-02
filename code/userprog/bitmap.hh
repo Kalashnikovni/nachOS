@@ -17,8 +17,8 @@
 #define NACHOS_USERPROG_BITMAP__HH
 
 
-#include "filesys/open_file.hh"
-#include "threads/utility.hh"
+#include "open_file.hh"
+#include "utility.hh"
 
 
 /// Definitions helpful for representing a bitmap as an array of integers.

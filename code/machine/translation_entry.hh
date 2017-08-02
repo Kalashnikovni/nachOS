@@ -18,7 +18,7 @@
 #define NACHOS_MACHINE_TRANSLATE__HH
 
 
-#include "threads/utility.hh"
+#include "utility.hh"
 
 
 /// The following class defines an entry in a translation table -- either

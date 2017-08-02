@@ -13,12 +13,12 @@
 #include "utility.hh"
 #include "thread.hh"
 #include "scheduler.hh"
-#include "machine/interrupt.hh"
-#include "machine/statistics.hh"
-#include "machine/timer.hh"
-#include "userprog/bitmap.hh"
-#include "userprog/address_space.hh"
-#include "userprog/synch_console.hh"
+#include "interrupt.hh"
+#include "statistics.hh"
+#include "timer.hh"
+#include "bitmap.hh"
+#include "address_space.hh"
+#include "synch_console.hh"
 
 /// Initialization and cleanup routines.
 
@@ -41,27 +41,27 @@ extern Thread **ptable;              ///< SpaceId table.
 extern SynchConsole *sconsole;
 
 #ifdef USER_PROGRAM
-#include "machine/machine.hh"
+#include "machine.hh"
 extern Machine* machine;  // User program memory and registers.
 #endif
 
 #ifdef FILESYS_NEEDED  // *FILESYS* or 8FILESYS_STUB*.
-#include "filesys/file_system.hh"
+#include "file_system.hh"
 extern FileSystem *fileSystem;
 #endif
 
 #ifdef FILESYS
-#include "filesys/synch_disk.hh"
+#include "synch_disk.hh"
 extern SynchDisk *synchDisk;
 #endif
 
 #ifdef NETWORK
-#include "network/post.hh"
+#include "post.hh"
 extern PostOffice *postOffice;
 #endif
 
 #ifdef VMEM
-#include "vmem/coremap.hh"
+#include "coremap.hh"
 extern Coremap *coremap;
 #endif
 

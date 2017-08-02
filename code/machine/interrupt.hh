@@ -35,7 +35,7 @@
 #define NACHOS_MACHINE_INTERRUPT__HH
 
 
-#include "threads/list.hh"
+#include "list.hh"
 
 
 /// Interrupts can be disabled (`INT_OFF`) or enabled (`INT_ON`).

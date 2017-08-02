@@ -23,7 +23,7 @@
 
 #include "disk.hh"
 #include "translation_entry.hh"
-#include "threads/utility.hh"
+#include "utility.hh"
 
 
 /// Definitions related to the size, and format of user memory.

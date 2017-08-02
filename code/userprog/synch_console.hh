@@ -4,8 +4,8 @@
 #ifndef SYNCH_CONSOLE_HH
 #define SYNCH_CONSOLE_HH
 
-#include "threads/synch.hh"
-#include "machine/console.hh"
+#include "synch.hh"
+#include "console.hh"
 
 class SynchConsole {
 public:

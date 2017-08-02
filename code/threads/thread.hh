@@ -40,12 +40,12 @@
 
 
 #include "utility.hh"
-#include "filesys/open_file.hh"
-#include "userprog/syscall.h"
+#include "open_file.hh"
+#include "syscall.h"
 
 #ifdef USER_PROGRAM
-#include "machine/machine.hh"
-#include "userprog/address_space.hh"
+#include "machine.hh"
+#include "address_space.hh"
 #endif
 
 

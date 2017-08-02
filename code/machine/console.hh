@@ -24,7 +24,7 @@
 #define NACHOS_MACHINE_CONSOLE__HH
 
 
-#include "threads/utility.hh"
+#include "utility.hh"
 
 
 /// The following class defines a hardware console device.
