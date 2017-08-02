@@ -33,6 +33,7 @@
 #include "userprog/address_space.hh"
 
 
+
 /// Routines for converting Words and Short Words to and from the simulated
 /// machine's format of little endian.  These end up being NOPs when the host
 /// machine is also little endian (DEC and Intel).
@@ -253,11 +254,12 @@ Machine::Translate(unsigned virtAddr, unsigned *physAddr,
     entry->use = true;  // Set the `use`, `dirty` bits.
     if (writing) {
         entry->dirty = true;
+        coremap->setDirty(pageFrame) ;
     }
     *physAddr = pageFrame * PAGE_SIZE + offset;
     ASSERT(*physAddr >= 0 && *physAddr + size <= MEMORY_SIZE);
     // Update age of physical page
-    victimList[pageFrame] = 1;
+    coremap->setUsed(pageFrame);
     DEBUG('a', "phys addr = 0x%X\n", *physAddr);
     return NO_EXCEPTION;
 }

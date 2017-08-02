@@ -182,6 +182,7 @@ AddressSpace::AddressSpace(OpenFile *exec)
 #endif
         pageTable[i].use          = false;
         pageTable[i].dirty        = false;
+        coremap->setDirty(pageTable[i].physicalPage);
         pageTable[i].readOnly     = false;
         // If the code segment was entirely on a separate page, we could
         // set its pages to be read-only.
