@@ -12,7 +12,7 @@
 #define NACHOS_THREADS_LIST__HH
 
 
-#include "utility.hh"
+#include "threads/utility.hh"
 
 
 /// The following class defines a “list element” -- which is used to keep

@@ -22,6 +22,7 @@
 
 const unsigned USER_STACK_SIZE = 1024;  ///< Increase this as necessary!
 
+class Coremap;
 
 class AddressSpace {
 public:

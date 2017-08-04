@@ -15,8 +15,8 @@
 /// All rights reserved.  See `copyright.h` for copyright notice and
 /// limitation of liability and disclaimer of warranty provisions.
 
+#include "userprog/address_space.hh"
 #include "threads/system.hh"
-#include "vmem/coremap.hh"
 
 /// Do little endian to big endian conversion on the bytes in the object file
 /// header, in case the file was generated on a little endian machine, and we
@@ -58,8 +58,9 @@ AddressSpace::LoadSegment(int vaddr)
     }
     
     int vpn = vaddr / PAGE_SIZE;
+#ifndef VMEM
     pageTable[vpn].physicalPage = vpages->Find();
-#ifdef VMEM
+#else
     pageTable[vpn].physicalPage = coremap->Find(currentThread->space, vpn);
 #endif
     ASSERT(pageTable[vpn].physicalPage >= 0);
@@ -175,14 +176,20 @@ AddressSpace::AddressSpace(OpenFile *exec)
         pageTable[i].physicalPage = -1;
         pageTable[i].valid        = false;
 #else
-        pageTable[i].physicalPage = vpages->Find(); 
+#ifndef VMEM
+        pageTable[i].physicalPage = vpages->Find();
+#else
+        pageTable[i].physicalPage = coremap->Find(currentThread->space, i);
+#endif
         ASSERT(pageTable[i].physicalPage >=0); 
         DEBUG('j',"Assigning physPage: [%d]%d \n",i ,pageTable[i].physicalPage);
         pageTable[i].valid        = true;
 #endif
         pageTable[i].use          = false;
         pageTable[i].dirty        = false;
+#ifdef VMEM
         coremap->setDirty(pageTable[i].physicalPage);
+#endif
         pageTable[i].readOnly     = false;
         // If the code segment was entirely on a separate page, we could
         // set its pages to be read-only.
@@ -237,10 +244,13 @@ AddressSpace::AddressSpace(OpenFile *exec)
 /// Nothing for now!
 AddressSpace::~AddressSpace()
 {
+#ifndef VMEM
     unsigned i;
     for(i=0; i < numPages; i++)
         vpages->Clear(pageTable[i].physicalPage);
     delete [] pageTable;
+#else
+#endif
 }
 
 /// Set the initial values for the user-level register set.

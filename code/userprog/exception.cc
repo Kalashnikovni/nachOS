@@ -22,12 +22,12 @@
 /// limitation of liability and disclaimer of warranty provisions.
 
 
-#include "syscall.h"
+#include "userprog/syscall.h"
 #include "threads/system.hh"
 #include "filesys/file_system.hh"
 #include "filesys/open_file.hh"
-#include "iobuffer.hh"
-#include "args.cc"
+#include "userprog/iobuffer.hh"
+#include "userprog/args.cc"
 
 void IncreasePC();
 void StartProc(void *);

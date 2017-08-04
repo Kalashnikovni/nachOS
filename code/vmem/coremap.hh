@@ -3,8 +3,9 @@
 #ifndef _COREMAP_HH_
 #define _COREMAP_HH_
 
+#include "machine/machine.hh"
+#include "threads/system.hh"
 #include "userprog/address_space.hh"
-#include "machine.hh"
 #include "userprog/bitmap.hh"
 
 typedef struct pair {                                     
