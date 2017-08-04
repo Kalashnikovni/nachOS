@@ -7,7 +7,6 @@
 #include "threads/system.hh"
 #include "userprog/address_space.hh"
 #include "userprog/bitmap.hh"
-#include "machine.hh"
 
 typedef struct pair {                                     
     int used;
