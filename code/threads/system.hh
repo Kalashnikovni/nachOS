@@ -10,9 +10,9 @@
 
 #define MAX_NPROCS 1000
 
-#include "utility.hh"
-#include "thread.hh"
-#include "scheduler.hh"
+#include "threads/utility.hh"
+#include "threads/thread.hh"
+#include "threads/scheduler.hh"
 #include "machine/interrupt.hh"
 #include "machine/statistics.hh"
 #include "machine/timer.hh"
@@ -36,13 +36,20 @@ extern Interrupt *interrupt;         ///< Interrupt status.
 extern Statistics *stats;            ///< Performance metrics.
 extern Timer *timer;                 ///< The hardware alarm clock.
 
-extern BitMap *vpages;               ///< Virtual page to physical page translator.
 extern Thread **ptable;              ///< SpaceId table.
 extern SynchConsole *sconsole;
 
 #ifdef USER_PROGRAM
 #include "machine/machine.hh"
 extern Machine* machine;  // User program memory and registers.
+
+#ifndef VMEM
+extern BitMap *vpages;               ///< Virtual page to physical page translator.
+#else 
+#include "vmem/coremap.hh"
+extern Coremap *coremap;
+#endif
+
 #endif
 
 #ifdef FILESYS_NEEDED  // *FILESYS* or 8FILESYS_STUB*.
@@ -60,9 +67,5 @@ extern SynchDisk *synchDisk;
 extern PostOffice *postOffice;
 #endif
 
-#ifdef VMEM
-#include "vmem/coremap.hh"
-extern Coremap *coremap;
-#endif
 
 #endif

@@ -2,9 +2,9 @@
 // relaying mainly on the functions ReadMem and
 // WriteMem defined in machine/translate
 
-#include "machine.hh"
-#include "system.hh"
-#include "iobuffer.hh"
+#include "machine/machine.hh"
+#include "threads/system.hh"
+#include "userprog/iobuffer.hh"
 
 
 // Llamamos dos veces porque en el primer acceso puede haber un TLB miss

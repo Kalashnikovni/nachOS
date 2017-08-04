@@ -18,8 +18,8 @@
 /// limitation of liability and disclaimer of warranty provisions.
 
 
-#include "scheduler.hh"
-#include "system.hh"
+#include "threads/scheduler.hh"
+#include "threads/system.hh"
 
 
 /// Initialize the list of ready but not running threads to empty.

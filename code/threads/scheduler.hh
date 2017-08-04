@@ -15,8 +15,8 @@
 #endif
 
 
-#include "list.hh"
-#include "thread.hh"
+#include "threads/list.hh"
+#include "threads/thread.hh"
 
 
 /// The following class defines the scheduler/dispatcher abstraction --

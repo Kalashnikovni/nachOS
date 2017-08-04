@@ -254,12 +254,16 @@ Machine::Translate(unsigned virtAddr, unsigned *physAddr,
     entry->use = true;  // Set the `use`, `dirty` bits.
     if (writing) {
         entry->dirty = true;
+#ifdef VMEM
         coremap->setDirty(pageFrame) ;
+#endif
     }
     *physAddr = pageFrame * PAGE_SIZE + offset;
     ASSERT(*physAddr >= 0 && *physAddr + size <= MEMORY_SIZE);
     // Update age of physical page
+#ifdef VMEM
     coremap->setUsed(pageFrame);
+#endif
     DEBUG('a', "phys addr = 0x%X\n", *physAddr);
     return NO_EXCEPTION;
 }

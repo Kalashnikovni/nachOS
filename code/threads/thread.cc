@@ -17,10 +17,10 @@
 /// limitation of liability and disclaimer of warranty provisions.
 
 
-#include "thread.hh"
-#include "switch.h"
-#include "synch.hh"
-#include "system.hh"
+#include "threads/thread.hh"
+#include "threads/switch.h"
+#include "threads/synch.hh"
+#include "threads/system.hh"
 
 
 /// This is put at the top of the execution stack, for detecting stack
@@ -330,7 +330,7 @@ Thread::CloseAllFiles()
 
 
 #ifdef USER_PROGRAM
-#include "machine.hh"
+#include "machine/machine.hh"
 
 /// Save the CPU state of a user program on a context switch.
 ///

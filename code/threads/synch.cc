@@ -22,8 +22,8 @@
 /// limitation of liability and disclaimer of warranty provisions.
 
 
-#include "synch.hh"
-#include "system.hh"
+#include "threads/synch.hh"
+#include "threads/system.hh"
 
 
 /// Initialize a semaphore, so that it can be used for synchronization.
