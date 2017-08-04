@@ -103,7 +103,7 @@ AddressSpace::SaveToSwap(int vpn)
         }
     }
 #endif
-    pageTable[vpn].valid = false;
+    pageTable[vpn].valid = false;  /* TODO NO DEBERIA INVALIDARSE LA PAGINA!!!!!*/
     pageTable[vpn].physicalPage = -2;
 }
 
@@ -188,7 +188,7 @@ AddressSpace::AddressSpace(OpenFile *exec)
         pageTable[i].use          = false;
         pageTable[i].dirty        = false;
 #ifdef VMEM
-        coremap->setDirty(pageTable[i].physicalPage);
+        coremap->SetDirty(pageTable[i].physicalPage);
 #endif
         pageTable[i].readOnly     = false;
         // If the code segment was entirely on a separate page, we could

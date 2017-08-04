@@ -220,7 +220,7 @@ ExceptionHandler(ExceptionType which)
         DEBUG('w', "DENU: %d %d\n", vaddr, machine->pageTableSize * PAGE_SIZE);
         int vpn   = vaddr/PAGE_SIZE;
         if((vaddr < 0) || (vaddr >= (currentThread->space->getNumPages() * PAGE_SIZE))){
-            DEBUG('b', "Page fault exception error in address \n");
+            DEBUG('p', "Page fault exception error in address %d\nWith proces limit %d\n", vaddr, (currentThread->space->getNumPages() * PAGE_SIZE));
             ASSERT(false);
         }
 #ifdef USE_DML

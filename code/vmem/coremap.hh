@@ -13,21 +13,25 @@ typedef struct pair {
     int dirty;                                            
 } pageStatus;
 
+class AddressSpace; 
+
 class Coremap: public BitMap
 {
 public:
     Coremap(int n);
     int Find(AddressSpace *addr, int i);
-    void setUsed(int page);
-    void setDirty(int page);    
+    void SetUsed(int page);
+    void SetDirty(int page);    
+    int RelatedVPN(int ppn); //toma ppn y devuelve vpn
 private:
     int SelectVictim();
     AddressSpace *owner[NUM_PHYS_PAGES];
     int VPN[NUM_PHYS_PAGES];
     int nextVictim;
+    int lastVictim;
     int nitems;
     pageStatus victimList[NUM_PHYS_PAGES];           //lista de victimas
-    void clearPageStatus(pageStatus*);               //inicializa ""
+    void ClearPageStatus(pageStatus*);               //inicializa ""
 };
 
 
