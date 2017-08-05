@@ -20,7 +20,6 @@ Coremap::Find(AddressSpace *own, int vpn)
         int victim = SelectVictim();
         DEBUG('p', "victim number with value %d\n", victim); 
         ASSERT((0 <= victim) && (victim < NUM_PHYS_PAGES));
-        owner[victim] -> SaveToSwap(VPN[victim]);
         free = victim;
     }
     owner[free] = own;
@@ -29,6 +28,7 @@ Coremap::Find(AddressSpace *own, int vpn)
 }
 
 // Second chance policy
+/*
 int
 Coremap::SelectVictim()
 {
@@ -49,7 +49,7 @@ Coremap::SelectVictim()
     for(i=lastVictim; i < limit; i++){
         inpp = i % NUM_PHYS_PAGES;               // Save keep the remanent so we can indent
         if (victimList[inpp].dirty){
-            //currentThread->space->SaveToSwap(RelatedVPN(inpp));
+            owner[inpp]->SaveToSwap(RelatedVPN(inpp));
             return inpp;
         }    
     } 
@@ -57,16 +57,17 @@ Coremap::SelectVictim()
     ASSERT(false);
 //    if (i == NUM_PHYS_PAGES)
 //        selectVictimForcingSwap(victimList);
-}
+}*/
 
 
 // FIFO policy
-/*int
+int
 Coremap::SelectVictim()
 {
     nextVictim = ++nextVictim % nitems;
+    owner[nextVictim] -> SaveToSwap(VPN[nextVictim]);
     return nextVictim;
-}*/
+}
 
 void 
 Coremap::SetUsed(int page){
