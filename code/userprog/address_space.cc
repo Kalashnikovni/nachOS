@@ -284,7 +284,8 @@ AddressSpace::InitRegisters()
 
 /// On a context switch, save any machine state, specific to this address
 /// space, that needs saving.
-void AddressSpace::SaveState()
+void 
+AddressSpace::SaveState()
 {
 #ifdef USE_TLB
     DEBUG('b', "Saving state (TLB)\n");
@@ -304,7 +305,8 @@ void AddressSpace::SaveState()
 /// can run.
 ///
 /// For now, tell the machine where to find the page table.
-void AddressSpace::RestoreState()
+void 
+AddressSpace::RestoreState()
 {
 #ifdef USE_TLB
 DEBUG('b', "Restoring state (TLB)\n");
@@ -317,20 +319,7 @@ machine->pageTable     = pageTable;
 machine->pageTableSize = numPages;
 }
 
-
-TranslationEntry AddressSpace::bringPage(unsigned pos)
-{
-    return pageTable[pos];
+void AddressSpace::CopyPage(unsigned from, unsigned to) 
+{ 
+    pageTable[to] = machine->tlb[from]; 
 }
-
-
-void AddressSpace::copyPage(unsigned from, unsigned to)
-{
-    pageTable[to] = machine->tlb[from];
-}
-
-int AddressSpace::getNumPages()
-{
-    return numPages;
-}
-

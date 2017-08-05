@@ -218,13 +218,13 @@ ExceptionHandler(ExceptionType which)
         DEBUG('b', "Page fault exception encountered \n");
         int vaddr = machine->registers[BAD_VADDR_REG];
         int vpn   = vaddr/PAGE_SIZE;
-        if((vpn < 0) || (vpn >= currentThread->space->getNumPages())){
-            DEBUG('p', "Page fault exception error in address %d\nWith proces limit %d\n", vaddr, (currentThread->space->getNumPages() * PAGE_SIZE));
+        if((vpn < 0) || (vpn >= currentThread->space->GetNumPages())){
+            DEBUG('p', "Page fault exception error in address %d\nWith proces limit %d\n", vaddr, (currentThread->space->GetNumPages() * PAGE_SIZE));
             ASSERT(false);
         }
 #ifdef VMEM
         //If its on SWAP, load it
-        if((int)currentThread->space->bringPage(vpn).physicalPage == -2){
+        if((int)currentThread->space->BringPage(vpn).physicalPage == -2){
             //Find a position and store info in coremap
             int ppn = coremap->Find(currentThread->space, vpn);
             ASSERT(ppn >= 0);
@@ -232,11 +232,11 @@ ExceptionHandler(ExceptionType which)
         }
 #endif
 #ifdef USE_DML
-        if(currentThread->space->bringPage(vpn).physicalPage == -1){
+        if(currentThread->space->BringPage(vpn).physicalPage == -1){
             currentThread->space->LoadSegment(vaddr);
         }
 #endif
-        insertTLB(currentThread->space->bringPage(vpn));
+        insertTLB(currentThread->space->BringPage(vpn));
 
     } else if (which == READ_ONLY_EXCEPTION){
         DEBUG('b', "Read only exception encountered \n");
@@ -272,7 +272,7 @@ StartProc(void *args)
 }
 
 
-//PTABLE FUNCTIONS
+//> PTABLE FUNCTIONS
 SpaceId
 NewPid(Thread *t)
 {
@@ -292,7 +292,7 @@ RemovePid(SpaceId p)
 }
 
 
-//TLB FUNCTIONS
+//> TLB FUNCTIONS
 void
 insertTLB(TranslationEntry entry)
 {
@@ -305,6 +305,6 @@ insertTLB(TranslationEntry entry)
     }
     //if TLB is full (semi-random policy)
     i = rand() % 4;
-    currentThread->space->copyPage(i, machine->tlb[i].virtualPage);
+    currentThread->space->CopyPage(i, machine->tlb[i].virtualPage);
     machine->tlb[i] = entry;
 }

@@ -39,8 +39,8 @@
 #define NACHOS_THREADS_THREAD__HH
 
 
-#include "threads/utility.hh"
 #include "filesys/open_file.hh"
+#include "threads/utility.hh"
 #include "userprog/syscall.h"
 
 #ifdef USER_PROGRAM

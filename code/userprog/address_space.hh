@@ -14,9 +14,9 @@
 #define NACHOS_USERPROG_ADDRSPACE__HH
 
 
+#include "bin/noff.h"
 #include "filesys/file_system.hh"
 #include "machine/translation_entry.hh"
-#include "bin/noff.h"
 #include <math.h>
 
 
@@ -44,15 +44,15 @@ public:
     void SaveState();
     void RestoreState();
 
-    TranslationEntry bringPage(unsigned i);
-    void copyPage(unsigned from, unsigned to);
+    TranslationEntry BringPage(unsigned i) { return pageTable[i]; };
+    void CopyPage(unsigned from, unsigned to);
 
     void LoadSegment(int vaddr);
 
     void SaveToSwap(int vpn);
     void LoadFromSwap(int vpn, int ppn);
 
-    int getNumPages();
+    int GetNumPages() { return numPages; };
 
 private:
 

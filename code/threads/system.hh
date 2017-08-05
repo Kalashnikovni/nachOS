@@ -10,14 +10,13 @@
 
 #define MAX_NPROCS 1000
 
-#include "threads/utility.hh"
-#include "threads/thread.hh"
-#include "threads/scheduler.hh"
 #include "machine/interrupt.hh"
 #include "machine/statistics.hh"
 #include "machine/timer.hh"
+#include "threads/scheduler.hh"
+#include "threads/thread.hh"
+#include "threads/utility.hh"
 #include "userprog/bitmap.hh"
-#include "userprog/address_space.hh"
 #include "userprog/synch_console.hh"
 
 /// Initialization and cleanup routines.
@@ -41,7 +40,7 @@ extern SynchConsole *sconsole;
 
 #ifdef USER_PROGRAM
 #include "machine/machine.hh"
-extern Machine* machine;  // User program memory and registers.
+extern Machine *machine;  // User program memory and registers.
 
 #ifndef VMEM
 extern BitMap *vpages;               ///< Virtual page to physical page translator.
