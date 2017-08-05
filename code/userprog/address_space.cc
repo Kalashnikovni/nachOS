@@ -67,16 +67,6 @@ AddressSpace::LoadSegment(int vaddr)
     pageTable[vpn].physicalPage = ppn;
     int pp  = ppn * PAGE_SIZE;
 
-   /* int vpn = vaddr / PAGE_SIZE;
-#ifndef VMEM
-    pageTable[vpn].physicalPage = vpages->Find();
-#else
-    pageTable[vpn].physicalPage = coremap->Find(currentThread->space, vpn);
-#endif
-    ASSERT(pageTable[vpn].physicalPage >= 0);
-    int ppn = pageTable[vpn].physicalPage;
-    int pp  = ppn * PAGE_SIZE;
-*/
     for (int j = 0; (j < (int)PAGE_SIZE) && (j < executable->Length() - vpn * (int)PAGE_SIZE - segment.inFileAddr); j++){
         char c;
 
@@ -101,7 +91,6 @@ void
 AddressSpace::SaveToSwap(int vpn)
 {
     int ppn = pageTable[vpn].physicalPage;
-    DEBUG('y', "VPN, PHYSPAGE: %d %d\n", vpn, ppn);
     swapfile->WriteAt(&machine->mainMemory[ppn * PAGE_SIZE], PAGE_SIZE, vpn * PAGE_SIZE);
     /*Invalidar la entrada TLB si es el mismo proceso*/
 #ifdef USE_TLB

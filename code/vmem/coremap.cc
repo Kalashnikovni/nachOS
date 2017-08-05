@@ -25,7 +25,6 @@ Coremap::Find(AddressSpace *own, int vpn)
     }
     owner[free] = own;
     VPN[free] = vpn;
-    DEBUG('y', "FREE: %d\n", free);
     return free;
 }
 

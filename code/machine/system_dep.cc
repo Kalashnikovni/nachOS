@@ -148,7 +148,6 @@ void
 WriteFile(int fd, const char *buffer, int nBytes)
 {
     int retVal = write(fd, buffer, nBytes);
-    DEBUG('y', "RETVAL, BYTES, FD: %d %d %d\n",retVal, nBytes, fd);
     ASSERT(retVal == nBytes);
 }
 
