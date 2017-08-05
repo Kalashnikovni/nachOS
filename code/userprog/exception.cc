@@ -219,22 +219,22 @@ ExceptionHandler(ExceptionType which)
         int vaddr = machine->registers[BAD_VADDR_REG];
         DEBUG('w', "DENU: %d %d\n", vaddr, machine->pageTableSize * PAGE_SIZE);
         int vpn   = vaddr/PAGE_SIZE;
-        if((vaddr < 0) || (vaddr >= (currentThread->space->getNumPages() * PAGE_SIZE))){
+        if((vpn < 0) || (vpn >= currentThread->space->getNumPages())){
             DEBUG('p', "Page fault exception error in address %d\nWith proces limit %d\n", vaddr, (currentThread->space->getNumPages() * PAGE_SIZE));
             ASSERT(false);
         }
+#ifdef VMEM
+        //If its on SWAP, load it
+        if((int)currentThread->space->bringPage(vpn).physicalPage == -2){
+            //Find a position and store info in coremap
+            int ppn = coremap->Find(currentThread->space, vpn);
+            ASSERT(ppn >= 0);
+            currentThread->space->LoadFromSwap(vpn,ppn);
+        }
+#endif
 #ifdef USE_DML
         if(currentThread->space->bringPage(vpn).physicalPage == -1){
             currentThread->space->LoadSegment(vaddr);
-        }
-#endif
-#ifdef VMEM
-        //If its on SWAP, load it
-        if(currentThread->space->bringPage(vpn).physicalPage == -2){
-            //Find a position and store info in coremap
-            int ppn = coremap->Find(currentThread->space, vpn);
-            currentThread->space->LoadFromSwap(vpn,ppn);
-            /*TODO: leer de carpeta*/
         }
 #endif
         insertTLB(currentThread->space->bringPage(vpn));

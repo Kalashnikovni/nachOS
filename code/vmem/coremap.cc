@@ -20,11 +20,12 @@ Coremap::Find(AddressSpace *own, int vpn)
         int victim = SelectVictim();
         DEBUG('p', "victim number with value %d\n", victim); 
         ASSERT((0 <= victim) && (victim < NUM_PHYS_PAGES));
-//        owner[victim] -> SaveToSwap(VPN[victim]);
+        owner[victim] -> SaveToSwap(VPN[victim]);
         free = victim;
     }
     owner[free] = own;
     VPN[free] = vpn;
+    DEBUG('y', "FREE: %d\n", free);
     return free;
 }
 
@@ -49,7 +50,7 @@ Coremap::SelectVictim()
     for(i=lastVictim; i < limit; i++){
         inpp = i % NUM_PHYS_PAGES;               // Save keep the remanent so we can indent
         if (victimList[inpp].dirty){
-            currentThread->space->SaveToSwap(RelatedVPN(inpp));
+            //currentThread->space->SaveToSwap(RelatedVPN(inpp));
             return inpp;
         }    
     } 
