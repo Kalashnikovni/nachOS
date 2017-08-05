@@ -91,6 +91,7 @@ void
 AddressSpace::SaveToSwap(int vpn)
 {
     int ppn = pageTable[vpn].physicalPage;
+    DEBUG('y', "PHYSPAGE: %d\n", ppn);
     swapfile->WriteAt(&machine->mainMemory[ppn * PAGE_SIZE], PAGE_SIZE, vpn * PAGE_SIZE);
     /*Invalidar la entrada TLB si es el mismo proceso*/
 #ifdef USE_TLB
@@ -105,6 +106,7 @@ AddressSpace::SaveToSwap(int vpn)
 #endif
     pageTable[vpn].valid = false;  /* TODO NO DEBERIA INVALIDARSE LA PAGINA!!!!!*/
     pageTable[vpn].physicalPage = -2;
+    bzero(&(machine->mainMemory[ppn * PAGE_SIZE]), PAGE_SIZE); // Clean addressSpace
 }
 
 // Load a page from SWAP
@@ -179,7 +181,8 @@ AddressSpace::AddressSpace(OpenFile *exec)
 #ifndef VMEM
         pageTable[i].physicalPage = vpages->Find();
 #else
-        pageTable[i].physicalPage = coremap->Find(currentThread->space, i);
+        pageTable[i].physicalPage = coremap->Find(this, i);
+        coremap->SetDirty(pageTable[i].physicalPage);
 #endif
         ASSERT(pageTable[i].physicalPage >=0); 
         DEBUG('j',"Assigning physPage: [%d]%d \n",i ,pageTable[i].physicalPage);
@@ -187,9 +190,6 @@ AddressSpace::AddressSpace(OpenFile *exec)
 #endif
         pageTable[i].use          = false;
         pageTable[i].dirty        = false;
-#ifdef VMEM
-        coremap->SetDirty(pageTable[i].physicalPage);
-#endif
         pageTable[i].readOnly     = false;
         // If the code segment was entirely on a separate page, we could
         // set its pages to be read-only.
@@ -201,8 +201,10 @@ AddressSpace::AddressSpace(OpenFile *exec)
     // Zero out the entire address space, to zero the unitialized data
     // segment and the stack segment.
     for (unsigned i = 0; i < numPages; i++) {
-        DEBUG('j', "Zeroing out [%d]%d \n", i, pageTable[i].physicalPage);
-        bzero(&(machine->mainMemory[pageTable[i].physicalPage * PAGE_SIZE]), PAGE_SIZE);
+        if((int)pageTable[i].physicalPage >= 0){
+            DEBUG('j', "Zeroing out [%d]%d \n", i, pageTable[i].physicalPage);
+            bzero(&(machine->mainMemory[pageTable[i].physicalPage * PAGE_SIZE]), PAGE_SIZE);
+        }
     }
 
     DEBUG('a', "Finished zeroing out the pagetable address... \n");

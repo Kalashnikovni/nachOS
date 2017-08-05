@@ -19,21 +19,22 @@ class Coremap: public BitMap
 {
 public:
     Coremap(int n);
+
     int Find(AddressSpace *addr, int i);
     void SetUsed(int page);
     void SetDirty(int page);    
     int RelatedVPN(int ppn); //toma ppn y devuelve vpn
 private:
-    int SelectVictim();
+    int nitems;
+
     AddressSpace *owner[NUM_PHYS_PAGES];
     int VPN[NUM_PHYS_PAGES];
+
+    int SelectVictim();
     int nextVictim;
     int lastVictim;
-    int nitems;
     pageStatus victimList[NUM_PHYS_PAGES];           //lista de victimas
     void ClearPageStatus(pageStatus*);               //inicializa ""
 };
-
-
 
 #endif

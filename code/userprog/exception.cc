@@ -89,7 +89,7 @@ ExceptionHandler(ExceptionType which)
                 if(id == ConsoleInput){
                     unsigned i;
                     char c;
-                    for(i = 0; i < size; i++){
+                    for(i = 0; (int)i < size; i++){
                         c = sconsole->ReadChar();
                         mbuf[i] = c;
                     }
@@ -120,7 +120,7 @@ ExceptionHandler(ExceptionType which)
                 if(id == ConsoleOutput){
                     ReadBufferFromUser(pbuf,mbuf,size);
                     unsigned i;  
-                    for(i = 0; i < size; i++){
+                    for(i = 0; (int)i < size; i++){
                         sconsole->WriteChar(mbuf[i]);
                     }
                     wrote = i;
@@ -217,7 +217,6 @@ ExceptionHandler(ExceptionType which)
     } else if (which == PAGE_FAULT_EXCEPTION){
         DEBUG('b', "Page fault exception encountered \n");
         int vaddr = machine->registers[BAD_VADDR_REG];
-        DEBUG('w', "DENU: %d %d\n", vaddr, machine->pageTableSize * PAGE_SIZE);
         int vpn   = vaddr/PAGE_SIZE;
         if((vpn < 0) || (vpn >= currentThread->space->getNumPages())){
             DEBUG('p', "Page fault exception error in address %d\nWith proces limit %d\n", vaddr, (currentThread->space->getNumPages() * PAGE_SIZE));
@@ -298,7 +297,7 @@ void
 insertTLB(TranslationEntry entry)
 {
     int i;
-    for(i = 0; i < TLB_SIZE; i++){
+    for(i = 0; i < (int)TLB_SIZE; i++){
         if(!machine->tlb[i].valid){
             machine->tlb[i] = entry;
             return;

@@ -255,7 +255,7 @@ Machine::Translate(unsigned virtAddr, unsigned *physAddr,
     if (writing) {
         entry->dirty = true;
 #ifdef VMEM
-        coremap->SetDirty(pageFrame) ;
+        coremap->SetDirty(pageFrame);
 #endif
     }
     *physAddr = pageFrame * PAGE_SIZE + offset;

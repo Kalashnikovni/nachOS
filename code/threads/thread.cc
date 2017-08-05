@@ -134,7 +134,7 @@ Thread::CheckOverflow()
 /// NOTE: we disable interrupts, so that we do not get a time slice between
 /// setting `threadToBeDestroyed`, and going to sleep.
 void
-Thread::Finish(int status)
+Thread::Finish(int stat)
 {
     interrupt->SetLevel(INT_OFF);
     ASSERT(this == currentThread);
@@ -142,7 +142,7 @@ Thread::Finish(int status)
     DEBUG('t', "Finishing thread \"%s\"\n", getName());
 
     if (isJoineable)
-        joinPort->Send(status); //Waits for father to end
+        joinPort->Send(stat); //Waits for father to end
 
     threadToBeDestroyed = currentThread;
     Sleep();  // Invokes `SWITCH`.
