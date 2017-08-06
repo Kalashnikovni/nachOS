@@ -12,7 +12,7 @@
 /// limitation of liability and disclaimer of warranty provisions.
 
 
-#include "file_system.hh"
+#include "filesys/file_system.hh"
 #include "machine/disk.hh"
 #include "machine/statistics.hh"
 #include "threads/thread.hh"

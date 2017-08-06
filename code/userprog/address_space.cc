@@ -179,10 +179,9 @@ AddressSpace::AddressSpace(OpenFile *exec)
         pageTable[i].physicalPage = -1;
         pageTable[i].valid        = false;
 #else
-#ifdef USER_PROGRAM
+#ifndef VMEM
         pageTable[i].physicalPage = vpages->Find();
-#endif
-#ifdef VMEM
+#else
         pageTable[i].physicalPage = coremap->Find(this, i);
         coremap->SetDirty(pageTable[i].physicalPage);
 #endif

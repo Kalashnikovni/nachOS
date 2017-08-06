@@ -36,7 +36,7 @@
 #define NACHOS_FILESYS_FILESYS__HH
 
 
-#include "open_file.hh"
+#include "filesys/open_file.hh"
 
 
 #ifdef FILESYS_STUB  // Temporarily implement file system calls as calls to

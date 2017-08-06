@@ -13,7 +13,7 @@
 /// limitation of liability and disclaimer of warranty provisions.
 
 
-#include "synch_disk.hh"
+#include "filesys/synch_disk.hh"
 
 
 /// Disk interrupt handler.  Need this to be a C routine, because C++ cannot

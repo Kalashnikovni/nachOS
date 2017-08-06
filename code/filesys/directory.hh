@@ -15,7 +15,7 @@
 #define NACHOS_FILESYS_DIRECTORY__HH
 
 
-#include "open_file.hh"
+#include "filesys/open_file.hh"
 
 
 /// For simplicity, we assume file names are <= 9 characters long.
