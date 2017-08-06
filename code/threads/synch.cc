@@ -109,7 +109,9 @@ Lock::~Lock()
 void
 Lock::Acquire()
 {
-    ASSERT(holder != currentThread);
+    if(this->IsHeldByCurrentThread())
+        return;
+
     if (holder != NULL) {
         int currentPriority = currentThread->getPriority();
         if (holder->getPriority() < currentPriority)
