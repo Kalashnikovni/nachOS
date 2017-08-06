@@ -99,7 +99,7 @@ AddressSpace::SaveToSwap(int vpn)
         for (int i = 0; i < TLB_SIZE; i++){
             if (machine->tlb[i].valid && machine->tlb[i].virtualPage == vpn) {
                 pageTable[machine->tlb[i].virtualPage] = machine->tlb[i];
-                machine->tlb[i].valid = false;
+//                machine->tlb[i].valid = false;
             }
         }
     }

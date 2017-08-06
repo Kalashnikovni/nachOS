@@ -106,6 +106,7 @@ int
 Machine::ReadRegister(unsigned num) const
 {
     ASSERT(num < NUM_TOTAL_REGS);
+    DEBUG('q', "Register %u with value %d\n", num, registers[num]);
     return registers[num];
 }
 
