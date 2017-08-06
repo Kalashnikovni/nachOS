@@ -170,6 +170,7 @@ Initialize(int argc, char **argv)
     // But if it ever tries to give up the CPU, we better have a `Thread`
     // object to save its state.
     currentThread = new Thread("main");
+    currentThread->isJoineable = true;
     currentThread->setStatus(RUNNING);
 
     interrupt->Enable();

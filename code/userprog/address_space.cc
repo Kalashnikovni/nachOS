@@ -174,13 +174,15 @@ AddressSpace::AddressSpace(OpenFile *exec)
     pageTable = new TranslationEntry[numPages]; 
     for (unsigned i = 0; i < numPages; i++) {
         pageTable[i].virtualPage  = i;
+        pageTable[i].physicalPage  = i;
 #ifdef USE_DML
         pageTable[i].physicalPage = -1;
         pageTable[i].valid        = false;
 #else
-#ifndef VMEM
+#ifdef USER_PROGRAM
         pageTable[i].physicalPage = vpages->Find();
-#else
+#endif
+#ifdef VMEM
         pageTable[i].physicalPage = coremap->Find(this, i);
         coremap->SetDirty(pageTable[i].physicalPage);
 #endif

@@ -166,6 +166,8 @@ public:
 
     void CloseAllFiles();
 
+    bool isJoineable;
+
 private:
     // Some of the private data for this class is listed above.
 
@@ -186,8 +188,6 @@ private:
     /// Private data for Join:
     /// Port for Join children procs
     Port *joinPort;
-    ///
-    bool isJoineable;
 
     int priority;
 
