@@ -29,7 +29,7 @@ Coremap::Find(AddressSpace *own, int vpn)
 
 // Second chance policy
 
-int
+/*int
 Coremap::SelectVictim()
 {
     int limit = lastVictim + NUM_PHYS_PAGES;     // "NUM_PHYS_PAGES, starting from the last"
@@ -58,9 +58,9 @@ Coremap::SelectVictim()
     ASSERT(false);
 //    if (i == NUM_PHYS_PAGES)
 //        selectVictimForcingSwap(victimList);
-}
+}*/
 
-/*
+
 // FIFO policy
 int
 Coremap::SelectVictim()
@@ -69,7 +69,7 @@ Coremap::SelectVictim()
     owner[nextVictim] -> SaveToSwap(VPN[nextVictim]);
     return nextVictim;
 }
-*/
+
 void 
 Coremap::SetUsed(int page){
     victimList[page].used = 1;

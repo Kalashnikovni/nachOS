@@ -160,7 +160,7 @@ ExceptionHandler(ExceptionType which)
 
             case SC_Close:
             {
-                OpenFileId id = machine->ReadRegister(4);
+                OpenFileId id = (OpenFileId) machine->ReadRegister(4);
                 //Close the file
                 bool ret = currentThread->RemoveFile(id);
                 //Return if successful
@@ -216,7 +216,7 @@ ExceptionHandler(ExceptionType which)
 
     } else if (which == PAGE_FAULT_EXCEPTION){
         DEBUG('b', "Page fault exception encountered \n");
-        int vaddr = machine->registers[BAD_VADDR_REG];
+        int vaddr = machine->ReadRegister(BAD_VADDR_REG);
         int vpn   = vaddr/PAGE_SIZE;
         if((vpn < 0) || (vpn >= currentThread->space->GetNumPages())){
             DEBUG('p', "Page fault exception error in address %d\nWith proces limit %d\n", vaddr, (currentThread->space->GetNumPages() * PAGE_SIZE));
