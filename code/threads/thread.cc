@@ -276,7 +276,7 @@ Thread::Join()
     int retAddr;
     joinPort->Receive(&retAddr); //Wait for child to return.
 
-    delete joinPort;
+    //delete joinPort;
 }
 
 ///
