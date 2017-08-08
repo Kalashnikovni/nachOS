@@ -112,6 +112,7 @@ Lock::Acquire()
     if(this->IsHeldByCurrentThread())
         return;
 
+    DEBUG('1', "HOLDER: %p\n", holder);
     if (holder != NULL) {
         int currentPriority = currentThread->getPriority();
         if (holder->getPriority() < currentPriority)
@@ -127,6 +128,7 @@ Lock::Release()
 {
     if(IsHeldByCurrentThread()) {
         currentThread->setPriority(currentThread->getOriginalPriority());
+	holder = NULL;
         locksem->V();
     }
 }

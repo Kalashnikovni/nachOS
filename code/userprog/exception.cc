@@ -119,8 +119,8 @@ ExceptionHandler(ExceptionType which)
                 int wrote = -1;
                 if(id == ConsoleOutput){
                     ReadBufferFromUser(pbuf,mbuf,size);
-                    unsigned i;  
-                    for(i = 0; (int)i < size; i++){
+                    int i;  
+                    for(i = 0; i < size; i++){
                         sconsole->WriteChar(mbuf[i]);
                     }
                     wrote = i;
