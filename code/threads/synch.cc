@@ -112,7 +112,6 @@ Lock::Acquire()
     if(this->IsHeldByCurrentThread())
         return;
 
-    DEBUG('1', "HOLDER: %p\n", holder);
     if (holder != NULL) {
         int currentPriority = currentThread->getPriority();
         if (holder->getPriority() < currentPriority)
