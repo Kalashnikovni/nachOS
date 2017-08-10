@@ -21,14 +21,14 @@
 // Read a null terminated string from user mem
 // (The address is assumed to be 4 byte aligned)
 void 
-ReadStringFromUser(int addr, char *strbuf, unsigned maxcount)
+ReadStringFromUser(int addr, char *strbuf, unsigned count)
 {
-    int i=0;
-    int c; 
+    int c;
+    unsigned int i=0;
     do {
         READMEM(addr+i, 1, &c);
-	strbuf[i++] = c;
-    } while ((c != '\0') && (i < maxcount-1));
+	    strbuf[i++] = (char) c;
+    } while ((c != '\0') && (i < count));
     strbuf[i]='\0'; //add EOF
 }
 
@@ -39,10 +39,11 @@ ReadStringFromUser(int addr, char *strbuf, unsigned maxcount)
 void
 ReadBufferFromUser(int addr, char *outbuf, unsigned count)
 {
-    int i,c;
+    int c;
+    unsigned int i;
     for (i=0; i < count; i++){
         READMEM(addr+i, 1, &c);
-	outbuf[i] = c;
+	    outbuf[i] = (char) c;
     }
 }
 
@@ -76,7 +77,6 @@ SpareReadBufferFromUser(int addr, char *outbuf, unsigned count)
 
 
 // Write a null terminated string to machine mem
-// FIXME: Do with a (do,while)
 void
 WriteStringToUser(const char *str, int addr)
 {
@@ -84,7 +84,7 @@ WriteStringToUser(const char *str, int addr)
     for(i=0; str[i] != '\0'; i++){
         WRITEMEM(addr+i, 1, str[i]);
     }
-    WRITEMEM(addr+i, 1, '\0');
+    //WRITEMEM(addr+i, 1, '\0');
 }
 
 
