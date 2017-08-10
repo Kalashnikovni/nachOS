@@ -99,12 +99,12 @@ AddressSpace::SaveToSwap(int vpn)
         for (int i = 0; i < TLB_SIZE; i++){
             if (machine->tlb[i].valid && machine->tlb[i].virtualPage == vpn) {
                 pageTable[machine->tlb[i].virtualPage] = machine->tlb[i];
-//                machine->tlb[i].valid = false;
+                machine->tlb[i].valid = false;
             }
         }
     }
 #endif
-    pageTable[vpn].valid = false;  /* TODO NO DEBERIA INVALIDARSE LA PAGINA!!!!!*/
+//    pageTable[vpn].valid = false;  /* TODO NO DEBERIA INVALIDARSE LA PAGINA!!!!!*/
     pageTable[vpn].physicalPage = -2;
     bzero(&(machine->mainMemory[ppn * PAGE_SIZE]), PAGE_SIZE); // Clean addressSpace
 }
