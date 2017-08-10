@@ -269,12 +269,13 @@ Thread::StackAllocate(VoidFunctionPtr func, void *arg)
 ///
 ///
 ///
-void
+int
 Thread::Join()
 {
-    ASSERT(joinPort != NULL);
     int retAddr;
+    ASSERT(joinPort != NULL);
     joinPort->Receive(&retAddr); //Wait for child to return.
+    return retAddr;
 
     //delete joinPort;
 }

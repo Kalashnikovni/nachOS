@@ -123,7 +123,7 @@ public:
     void Finish(int status = 0);
 
     /// The thread waits for a children.
-    void Join();
+    int Join();
 
     /// Check if thread has overflowed its stack.
     void CheckOverflow();
