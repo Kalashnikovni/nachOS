@@ -179,14 +179,14 @@ AddressSpace::AddressSpace(OpenFile *exec)
         pageTable[i].physicalPage = -1;
         pageTable[i].valid        = false;
 #else
-#ifndef VMEM
-        pageTable[i].physicalPage = vpages->Find();
-#else
+#ifdef VMEM
         pageTable[i].physicalPage = coremap->Find(this, i);
         coremap->SetDirty(pageTable[i].physicalPage);
+#else
+        pageTable[i].physicalPage = vpages->Find();
 #endif
         ASSERT(pageTable[i].physicalPage >=0); 
-        DEBUG('j',"Assigning physPage: [%d]%d \n",i ,pageTable[i].physicalPage);
+        DEBUG('j', "Assigning physPage: [%d]%d \n", i, pageTable[i].physicalPage);
         pageTable[i].valid        = true;
 #endif
         pageTable[i].use          = false;
