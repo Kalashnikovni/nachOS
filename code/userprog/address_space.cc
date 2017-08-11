@@ -60,10 +60,14 @@ AddressSpace::LoadSegment(int vaddr)
     }
     
     int vpn = vaddr / PAGE_SIZE;
-    pageTable[vpn].physicalPage = vpages->Find();
-    ASSERT(pageTable[vpn].physicalPage >= 0);
-    int ppn = pageTable[vpn].physicalPage;
-    int pp  = ppn * PAGE_SIZE;
+#ifndef VMEM
+    int ppn = vpages->Find();
+#else
+    int ppn = coremap->Find(currentThread->space, vpn);
+#endif
+    ASSERT(ppn >= 0);
+    pageTable[vpn].physicalPage = ppn;
+    int pp = ppn * PAGE_SIZE;
 
     for (int j = 0; (j < (int)PAGE_SIZE) && (j < executable->Length() - vpn * (int)PAGE_SIZE - segment.inFileAddr); j++){
         char c;
