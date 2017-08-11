@@ -39,8 +39,8 @@
 #define NACHOS_THREADS_THREAD__HH
 
 
+#include "utility.hh"
 #include "filesys/open_file.hh"
-#include "threads/utility.hh"
 #include "userprog/syscall.h"
 
 #ifdef USER_PROGRAM
@@ -123,7 +123,7 @@ public:
     void Finish(int status = 0);
 
     /// The thread waits for a children.
-    int Join();
+    void Join();
 
     /// Check if thread has overflowed its stack.
     void CheckOverflow();
@@ -166,8 +166,6 @@ public:
 
     void CloseAllFiles();
 
-    bool isJoineable;
-
 private:
     // Some of the private data for this class is listed above.
 
@@ -188,6 +186,8 @@ private:
     /// Private data for Join:
     /// Port for Join children procs
     Port *joinPort;
+    ///
+    bool isJoineable;
 
     int priority;
 

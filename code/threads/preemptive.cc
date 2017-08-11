@@ -6,10 +6,10 @@
 /// copies of this software.
 
 
-#include "threads/preemptive.hh"
+#include "preemptive.hh"
 
 // Access to global objects: `currentThread`, `interrupt`...
-#include "threads/system.hh"
+#include "system.hh"
 
 // UNIX and Linux-specific headers.
 #include <unistd.h>

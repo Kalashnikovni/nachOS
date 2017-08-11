@@ -7,7 +7,7 @@
 /// limitation of liability and disclaimer of warranty provisions.
 
 
-#include "userprog/bitmap.hh"
+#include "bitmap.hh"
 
 
 /// Initialize a bitmap with `nitems` bits, so that every bit is clear.  It

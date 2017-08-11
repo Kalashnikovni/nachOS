@@ -60,7 +60,7 @@ Machine::Machine(bool debug)
         tlb[i].valid = false;
     pageTable = NULL;
 #else  // Use linear page table.
-    tlb = NULL;
+    tlb       = NULL;
     pageTable = NULL;
 #endif
 
@@ -106,7 +106,6 @@ int
 Machine::ReadRegister(unsigned num) const
 {
     ASSERT(num < NUM_TOTAL_REGS);
-    DEBUG('q', "Register %u with value %d\n", num, registers[num]);
     return registers[num];
 }
 
@@ -114,7 +113,7 @@ void
 Machine::WriteRegister(unsigned num, int value)
 {
     ASSERT(num < NUM_TOTAL_REGS);
-    DEBUG('r', "WriteRegister %u, value %d\n", num, value);
+    //DEBUG('m', "WriteRegister %u, value %d\n", num, value);
     registers[num] = value;
 }
 

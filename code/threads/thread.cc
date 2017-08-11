@@ -17,10 +17,10 @@
 /// limitation of liability and disclaimer of warranty provisions.
 
 
-#include "threads/thread.hh"
-#include "threads/switch.h"
-#include "threads/synch.hh"
-#include "threads/system.hh"
+#include "thread.hh"
+#include "switch.h"
+#include "synch.hh"
+#include "system.hh"
 
 
 /// This is put at the top of the execution stack, for detecting stack
@@ -134,7 +134,7 @@ Thread::CheckOverflow()
 /// NOTE: we disable interrupts, so that we do not get a time slice between
 /// setting `threadToBeDestroyed`, and going to sleep.
 void
-Thread::Finish(int stat)
+Thread::Finish(int status)
 {
     interrupt->SetLevel(INT_OFF);
     ASSERT(this == currentThread);
@@ -142,7 +142,7 @@ Thread::Finish(int stat)
     DEBUG('t', "Finishing thread \"%s\"\n", getName());
 
     if (isJoineable)
-        joinPort->Send(stat); //Waits for father to end
+        joinPort->Send(status); //Waits for father to end
 
     threadToBeDestroyed = currentThread;
     Sleep();  // Invokes `SWITCH`.
@@ -269,15 +269,14 @@ Thread::StackAllocate(VoidFunctionPtr func, void *arg)
 ///
 ///
 ///
-int
+void
 Thread::Join()
 {
-    int retAddr;
     ASSERT(joinPort != NULL);
+    int retAddr;
     joinPort->Receive(&retAddr); //Wait for child to return.
-    return retAddr;
 
-    //delete joinPort;
+    delete joinPort;
 }
 
 ///
@@ -331,7 +330,7 @@ Thread::CloseAllFiles()
 
 
 #ifdef USER_PROGRAM
-#include "machine/machine.hh"
+#include "machine.hh"
 
 /// Save the CPU state of a user program on a context switch.
 ///

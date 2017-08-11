@@ -11,7 +11,7 @@
 /// limitation of liability and disclaimer of warranty provisions.
 
 
-#include "threads/system.hh"
+#include "system.hh"
 
 
 /// Loop 10 times, yielding the CPU to another ready thread each iteration.

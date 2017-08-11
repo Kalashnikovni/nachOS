@@ -22,12 +22,12 @@
 /// limitation of liability and disclaimer of warranty provisions.
 
 
-#include "userprog/syscall.h"
+#include "syscall.h"
 #include "threads/system.hh"
 #include "filesys/file_system.hh"
 #include "filesys/open_file.hh"
-#include "userprog/iobuffer.hh"
-#include "userprog/args.cc"
+#include "iobuffer.hh"
+#include "args.cc"
 
 void IncreasePC();
 void StartProc(void *);
@@ -69,11 +69,9 @@ ExceptionHandler(ExceptionType which)
             {
                 int pname = machine->ReadRegister(4);
                 char name[128];
-
                 //Create the file
                 ReadStringFromUser(pname, name, 128);
                 int created = fileSystem->Create(name,0)?1:0;
-                
                 machine->WriteRegister(2, created);
                 IncreasePC();
                 break;
@@ -82,32 +80,30 @@ ExceptionHandler(ExceptionType which)
             case SC_Read:
             {
                 //Pointer to memory location where the desired data is allocated
-                int pbuf      = machine->ReadRegister(4);
-                int size      = machine->ReadRegister(5);
+                int pbuf = machine->ReadRegister(4);
+                int size = machine->ReadRegister(5);
                 OpenFileId id = machine->ReadRegister(6);
-                char *mbuf    = new char[size];
-                int read      = -1;
-
+                char *mbuf = new char[size];
                 //Obtain file from filesystem
+                int read = -1;
                 if(id == ConsoleInput){
                     unsigned i;
                     char c;
-                    for(i = 0; (int)i < size; i++){
+                    for(i = 0; i < size; i++){
                         c = sconsole->ReadChar();
                         mbuf[i] = c;
                     }
                     WriteBufferToUser((const char*)mbuf,pbuf,size);
                     read = i;
                 }
-                else if(id > 1){
-                    OpenFile *file = currentThread->GetFile(id);
-                    if(file != NULL) {
+                else if(id >= 0){
+                    OpenFile *f = currentThread->GetFile(id);
+                    if(f != NULL) {
                         //Read the file
-                        read = file->Read(mbuf, size);
+                        read = f->Read(mbuf, size);
                         WriteBufferToUser((const char*)mbuf,pbuf,size);
                     }
                 }
-
                 //Return how much was read
                 machine->WriteRegister(2, read);
                 IncreasePC();
@@ -116,27 +112,27 @@ ExceptionHandler(ExceptionType which)
 
             case SC_Write:
             {
-                int pbuf      = machine->ReadRegister(4);
-                int size      = machine->ReadRegister(5);
+                int pbuf = machine->ReadRegister(4);
+                int size = machine->ReadRegister(5);
                 OpenFileId id = machine->ReadRegister(6);
-                char *mbuf    = new char[size];
-                int wrote     = -1;
-
-                ReadBufferFromUser(pbuf,mbuf,size);
-
+                char *mbuf = new char[size];
+                int wrote = -1;
                 if(id == ConsoleOutput){
-                    int i;  
-                    for(i = 0; i < size; i++)
+                    ReadBufferFromUser(pbuf,mbuf,size);
+                    unsigned i;  
+                    for(i = 0; i < size; i++){
                         sconsole->WriteChar(mbuf[i]);
+                    }
                     wrote = i;
                 }
                 else{
                     //Obtain file from filesystem
                     OpenFile *f = currentThread->GetFile(id);
-                    if(f != NULL) 
+                    if(f != NULL) {
+                        ReadBufferFromUser(pbuf,mbuf,size);
                         wrote = f->Write((const char*)mbuf,size);
+                    }
                 }
-
                 //Return how much was written
                 machine->WriteRegister(2, wrote);
                 IncreasePC();
@@ -147,7 +143,6 @@ ExceptionHandler(ExceptionType which)
             {
                 int pname = machine->ReadRegister(4);
                 char name[128];
-
                 //Open the file
     	        ReadStringFromUser(pname, name, 128);
                 OpenFile *f = fileSystem->Open(name);
@@ -157,7 +152,6 @@ ExceptionHandler(ExceptionType which)
                     if(fid < 0)
                         delete f;
                 }
-
                 //Return the fileid
                 machine->WriteRegister(2, fid);
                 IncreasePC();
@@ -166,16 +160,9 @@ ExceptionHandler(ExceptionType which)
 
             case SC_Close:
             {
-                OpenFileId id  = (OpenFileId) machine->ReadRegister(4);
-                OpenFile *file = currentThread->GetFile(id);
-                bool ret = false;
-
+                OpenFileId id = machine->ReadRegister(4);
                 //Close the file
-                if(file != NULL && id > 1){
-                    ret = currentThread->RemoveFile(id);
-                    delete file;
-                }
-
+                bool ret = currentThread->RemoveFile(id);
                 //Return if successful
                 machine->WriteRegister(2, ret);
                 IncreasePC();
@@ -185,9 +172,7 @@ ExceptionHandler(ExceptionType which)
             case SC_Exit:
             {
                 int status = machine->ReadRegister(4);
-
                 currentThread->CloseAllFiles();
-
                 //Terminate the thread
                 currentThread->Finish(status);
                 stats->Print();
@@ -196,18 +181,10 @@ ExceptionHandler(ExceptionType which)
 
             case SC_Join:
             {
-                int ret;
-                SpaceId pid    = machine->ReadRegister(4);
-
-                Thread *thread = ptable[pid];
-                if(thread != NULL){
-                    ret = thread->Join();
-                    RemovePid(pid);
-                }
-                else
-                    ret = -1;
-
-                machine->WriteRegister(2, ret);
+                SpaceId pid = machine->ReadRegister(4);
+                Thread *t = ptable[pid];
+                t->Join();
+                machine->WriteRegister(2, 0);
                 IncreasePC();
                 break;
             }
@@ -217,25 +194,20 @@ ExceptionHandler(ExceptionType which)
                 int pname = machine->ReadRegister(4);
                 int pargs = machine->ReadRegister(5);
                 char name[128];
-
                 //Create a new thread
                 ReadStringFromUser(pname, name, 128);
                 OpenFile *exec = fileSystem->Open(name); //TODO? do a delete of exec?
                 SpaceId pid = -1;
-
-                //Execute new thread
                 if(exec!=NULL){
-                    char **args      = SaveArgs(pargs);
-                    Thread *t        = new Thread(strdup(name), 0, true); //All threads start as joinable
-                    pid              = NewPid(t);
-                    ASSERT(pid != -1);
+                    //All threads will start as joineable
+                    Thread *t = new Thread(strdup(name), 0, true);
+                    pid = NewPid(t);
+                    AddressSpace *as = new AddressSpace(exec);
+                    t->space = as;
+                    char **args = SaveArgs(pargs);
                     //StartProc will WriteArgs (leaving r4 and r5 as argc and argv)
                     t->Fork(StartProc, args);
-
-                    AddressSpace *as = new AddressSpace(exec);
-                    t->space         = as;
                 }
-
                 machine->WriteRegister(2, pid);
                 IncreasePC();
                 break;
@@ -244,30 +216,27 @@ ExceptionHandler(ExceptionType which)
 
     } else if (which == PAGE_FAULT_EXCEPTION){
         DEBUG('b', "Page fault exception encountered \n");
-        int vaddr = machine->ReadRegister(BAD_VADDR_REG);
+        int vaddr = machine->registers[BAD_VADDR_REG];
         int vpn   = vaddr/PAGE_SIZE;
-        if((vpn < 0) || (vpn >= currentThread->space->GetNumPages())){
-            DEBUG('p', "Page fault exception error in address %d\nWith proces limit %d\n", vaddr, (currentThread->space->GetNumPages() * PAGE_SIZE));
+        if((vaddr < 0) || currentThread->space->InvalidVPN(vaddr)){
+            DEBUG('b', "Page fault exception error in address \n");
             ASSERT(false);
         }
-
-#ifdef VMEM
-        //If its on SWAP, load it
-        if((int)currentThread->space->BringPage(vpn).physicalPage == -2){
-            //Find a position and store info in coremap
-            int ppn = coremap->Find(currentThread->space, vpn);
-            ASSERT(ppn >= 0);
-            currentThread->space->LoadFromSwap(vpn,ppn);
-        }
-#endif
-
 #ifdef USE_DML
-        if(currentThread->space->BringPage(vpn).physicalPage == -1){
+        if(currentThread->space->bringPage(vpn).physicalPage == -1){
             currentThread->space->LoadSegment(vaddr);
         }
 #endif
-
-        insertTLB(currentThread->space->BringPage(vpn));
+#ifdef VMEM
+        //If its on SWAP, load it
+        if(currentThread->space->bringPage(vpn).physicalPage == -2){
+            //Find a position and store info in coremap
+            int ppn = coremap->Find(currentThread->space, vpn);
+            currentThread->space->LoadFromSwap(vpn,ppn);
+            /*TODO: leer de carpeta*/
+        }
+#endif
+        insertTLB(currentThread->space->bringPage(vpn));
 
     } else if (which == READ_ONLY_EXCEPTION){
         DEBUG('b', "Read only exception encountered \n");
@@ -279,9 +248,7 @@ ExceptionHandler(ExceptionType which)
     }
 }
 
-// ********************* //
-//> Auxiliary functions <//
-// ********************* //
+
 void
 IncreasePC()
 {
@@ -304,9 +271,8 @@ StartProc(void *args)
     machine->Run();
 }
 
-// ****************** //
-//> PTABLE FUNCTIONS <//
-// ****************** //
+
+//PTABLE FUNCTIONS
 SpaceId
 NewPid(Thread *t)
 {
@@ -326,14 +292,12 @@ RemovePid(SpaceId p)
 }
 
 
-// *************** //
-//> TLB FUNCTIONS <//
-// *************** //
+//TLB FUNCTIONS
 void
 insertTLB(TranslationEntry entry)
 {
     int i;
-    for(i = 0; i < (int)TLB_SIZE; i++){
+    for(i = 0; i < TLB_SIZE; i++){
         if(!machine->tlb[i].valid){
             machine->tlb[i] = entry;
             return;
@@ -341,6 +305,6 @@ insertTLB(TranslationEntry entry)
     }
     //if TLB is full (semi-random policy)
     i = rand() % 4;
-    currentThread->space->CopyPage(i, machine->tlb[i].virtualPage);
+    currentThread->space->copyPage(i, machine->tlb[i].virtualPage);
     machine->tlb[i] = entry;
 }

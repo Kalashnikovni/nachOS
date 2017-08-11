@@ -9,7 +9,7 @@
 /// limitation of liability and disclaimer of warranty provisions.
 
 
-#include "threads/utility.hh"
+#include "utility.hh"
 
 // Warning: may be you will have problems with `va_start`.
 #include <stdarg.h>

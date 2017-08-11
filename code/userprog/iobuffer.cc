@@ -2,9 +2,9 @@
 // relaying mainly on the functions ReadMem and
 // WriteMem defined in machine/translate
 
-#include "machine/machine.hh"
-#include "threads/system.hh"
-#include "userprog/iobuffer.hh"
+#include "machine.hh"
+#include "system.hh"
+#include "iobuffer.hh"
 
 
 // Llamamos dos veces porque en el primer acceso puede haber un TLB miss
@@ -21,14 +21,14 @@
 // Read a null terminated string from user mem
 // (The address is assumed to be 4 byte aligned)
 void 
-ReadStringFromUser(int addr, char *strbuf, unsigned count)
+ReadStringFromUser(int addr, char *strbuf, unsigned maxcount)
 {
-    int c;
-    unsigned int i=0;
+    int i=0;
+    int c; 
     do {
         READMEM(addr+i, 1, &c);
-	    strbuf[i++] = (char) c;
-    } while ((c != '\0') && (i < count));
+	strbuf[i++] = c;
+    } while ((c != '\0') && (i < maxcount-1));
     strbuf[i]='\0'; //add EOF
 }
 
@@ -39,11 +39,10 @@ ReadStringFromUser(int addr, char *strbuf, unsigned count)
 void
 ReadBufferFromUser(int addr, char *outbuf, unsigned count)
 {
-    int c;
-    unsigned int i;
+    int i,c;
     for (i=0; i < count; i++){
         READMEM(addr+i, 1, &c);
-	    outbuf[i] = (char) c;
+	outbuf[i] = c;
     }
 }
 
@@ -77,6 +76,7 @@ SpareReadBufferFromUser(int addr, char *outbuf, unsigned count)
 
 
 // Write a null terminated string to machine mem
+// FIXME: Do with a (do,while)
 void
 WriteStringToUser(const char *str, int addr)
 {
@@ -84,7 +84,7 @@ WriteStringToUser(const char *str, int addr)
     for(i=0; str[i] != '\0'; i++){
         WRITEMEM(addr+i, 1, str[i]);
     }
-    //WRITEMEM(addr+i, 1, '\0');
+    WRITEMEM(addr+i, 1, '\0');
 }
 
 

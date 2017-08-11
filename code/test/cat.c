@@ -19,7 +19,7 @@ main(int argc, char **argv)
         else
             Write(error, 50, ConsoleOutput);
 
-        Close(fid);
+        Close(argv[i]);
     }
 
     Exit(0);

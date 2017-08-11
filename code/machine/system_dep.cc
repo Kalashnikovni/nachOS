@@ -158,6 +158,7 @@ void
 Lseek(int fd, int offset, int whence)
 {
     int retVal = lseek(fd, offset, whence);
+    DEBUG('z',"fd: %d, LSEEK: %s\n",fd, strerror(errno));
     ASSERT(retVal >= 0);
 }
 

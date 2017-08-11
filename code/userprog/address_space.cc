@@ -15,8 +15,10 @@
 /// All rights reserved.  See `copyright.h` for copyright notice and
 /// limitation of liability and disclaimer of warranty provisions.
 
-#include "userprog/address_space.hh"
+
+#include "address_space.hh"
 #include "threads/system.hh"
+
 
 /// Do little endian to big endian conversion on the bytes in the object file
 /// header, in case the file was generated on a little endian machine, and we
@@ -58,13 +60,9 @@ AddressSpace::LoadSegment(int vaddr)
     }
     
     int vpn = vaddr / PAGE_SIZE;
-#ifndef VMEM
-    int ppn = vpages->Find();
-#else
-    int ppn = coremap->Find(currentThread->space, vpn);
-#endif
-    ASSERT(ppn >= 0);
-    pageTable[vpn].physicalPage = ppn;
+    pageTable[vpn].physicalPage = vpages->Find();
+    ASSERT(pageTable[vpn].physicalPage >= 0);
+    int ppn = pageTable[vpn].physicalPage;
     int pp  = ppn * PAGE_SIZE;
 
     for (int j = 0; (j < (int)PAGE_SIZE) && (j < executable->Length() - vpn * (int)PAGE_SIZE - segment.inFileAddr); j++){
@@ -91,7 +89,6 @@ void
 AddressSpace::SaveToSwap(int vpn)
 {
     int ppn = pageTable[vpn].physicalPage;
-    DEBUG('y', "PHYSPAGE: %d\n", ppn);
     swapfile->WriteAt(&machine->mainMemory[ppn * PAGE_SIZE], PAGE_SIZE, vpn * PAGE_SIZE);
     /*Invalidar la entrada TLB si es el mismo proceso*/
 #ifdef USE_TLB
@@ -104,9 +101,8 @@ AddressSpace::SaveToSwap(int vpn)
         }
     }
 #endif
-//    pageTable[vpn].valid = false;  /* TODO NO DEBERIA INVALIDARSE LA PAGINA!!!!!*/
+    pageTable[vpn].valid = false;
     pageTable[vpn].physicalPage = -2;
-    bzero(&(machine->mainMemory[ppn * PAGE_SIZE]), PAGE_SIZE); // Clean addressSpace
 }
 
 // Load a page from SWAP
@@ -174,19 +170,13 @@ AddressSpace::AddressSpace(OpenFile *exec)
     pageTable = new TranslationEntry[numPages]; 
     for (unsigned i = 0; i < numPages; i++) {
         pageTable[i].virtualPage  = i;
-        pageTable[i].physicalPage  = i;
 #ifdef USE_DML
         pageTable[i].physicalPage = -1;
         pageTable[i].valid        = false;
 #else
-#ifdef VMEM
-        pageTable[i].physicalPage = coremap->Find(this, i);
-        coremap->SetDirty(pageTable[i].physicalPage);
-#else
-        pageTable[i].physicalPage = vpages->Find();
-#endif
+        pageTable[i].physicalPage = vpages->Find(); 
         ASSERT(pageTable[i].physicalPage >=0); 
-        DEBUG('j', "Assigning physPage: [%d]%d \n", i, pageTable[i].physicalPage);
+        DEBUG('j',"Assigning physPage: [%d]%d \n",i ,pageTable[i].physicalPage);
         pageTable[i].valid        = true;
 #endif
         pageTable[i].use          = false;
@@ -202,7 +192,7 @@ AddressSpace::AddressSpace(OpenFile *exec)
     // Zero out the entire address space, to zero the unitialized data
     // segment and the stack segment.
     for (unsigned i = 0; i < numPages; i++) {
-        if((int)pageTable[i].physicalPage >= 0){
+        if((int)pageTable[i].physicalPage>= 0) {
             DEBUG('j', "Zeroing out [%d]%d \n", i, pageTable[i].physicalPage);
             bzero(&(machine->mainMemory[pageTable[i].physicalPage * PAGE_SIZE]), PAGE_SIZE);
         }
@@ -247,13 +237,10 @@ AddressSpace::AddressSpace(OpenFile *exec)
 /// Nothing for now!
 AddressSpace::~AddressSpace()
 {
-#ifndef VMEM
     unsigned i;
     for(i=0; i < numPages; i++)
         vpages->Clear(pageTable[i].physicalPage);
     delete [] pageTable;
-#else
-#endif
 }
 
 /// Set the initial values for the user-level register set.
@@ -285,8 +272,7 @@ AddressSpace::InitRegisters()
 
 /// On a context switch, save any machine state, specific to this address
 /// space, that needs saving.
-void 
-AddressSpace::SaveState()
+void AddressSpace::SaveState()
 {
 #ifdef USE_TLB
     DEBUG('b', "Saving state (TLB)\n");
@@ -306,8 +292,7 @@ AddressSpace::SaveState()
 /// can run.
 ///
 /// For now, tell the machine where to find the page table.
-void 
-AddressSpace::RestoreState()
+void AddressSpace::RestoreState()
 {
 #ifdef USE_TLB
 DEBUG('b', "Restoring state (TLB)\n");
@@ -316,11 +301,19 @@ for(i = 0; i < TLB_SIZE; i++)
     machine->tlb[i].valid = false;
 #else
 machine->pageTable     = pageTable;
-#endif
 machine->pageTableSize = numPages;
+#endif
 }
 
-void AddressSpace::CopyPage(unsigned from, unsigned to) 
-{ 
-    pageTable[to] = machine->tlb[from]; 
+
+TranslationEntry AddressSpace::bringPage(unsigned pos)
+{
+    return pageTable[pos];
 }
+
+
+void AddressSpace::copyPage(unsigned from, unsigned to)
+{
+    pageTable[to] = machine->tlb[from];
+}
+

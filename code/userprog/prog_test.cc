@@ -9,7 +9,7 @@
 /// limitation of liability and disclaimer of warranty provisions.
 
 
-#include "userprog/address_space.hh"
+#include "address_space.hh"
 #include "machine/console.hh"
 #include "threads/synch.hh"
 #include "threads/system.hh"

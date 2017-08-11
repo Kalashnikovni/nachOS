@@ -12,8 +12,8 @@
 #define NACHOS_THREADS_SYNCHLIST__HH
 
 
-#include "threads/list.hh"
-#include "threads/synch.hh"
+#include "list.hh"
+#include "synch.hh"
 
 
 /// The following class defines a "synchronized list" -- a list for which

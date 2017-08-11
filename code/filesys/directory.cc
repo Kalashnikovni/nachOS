@@ -20,8 +20,8 @@
 /// limitation of liability and disclaimer of warranty provisions.
 
 
-#include "filesys/directory.hh"
-#include "filesys/file_header.hh"
+#include "file_header.hh"
+#include "directory.hh"
 #include "threads/utility.hh"
 
 
