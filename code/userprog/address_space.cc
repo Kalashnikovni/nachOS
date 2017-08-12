@@ -92,6 +92,7 @@ AddressSpace::LoadSegment(int vaddr)
 void
 AddressSpace::SaveToSwap(int vpn)
 {
+    DEBUG('8', "SAVE PAGE: %d\n", vpn);
     int ppn = pageTable[vpn].physicalPage;
     swapfile->WriteAt(&machine->mainMemory[ppn * PAGE_SIZE], PAGE_SIZE, vpn * PAGE_SIZE);
     /*Invalidar la entrada TLB si es el mismo proceso*/
@@ -113,6 +114,7 @@ AddressSpace::SaveToSwap(int vpn)
 void
 AddressSpace::LoadFromSwap(int vpn, int ppn)
 {
+    DEBUG('8', "LOAD PAGE: %d\n", vpn);
     swapfile->ReadAt(&machine->mainMemory[ppn * PAGE_SIZE], PAGE_SIZE, vpn * PAGE_SIZE);
     pageTable[vpn].physicalPage = ppn;
     pageTable[vpn].valid = true;
@@ -282,12 +284,12 @@ void AddressSpace::SaveState()
     DEBUG('b', "Saving state (TLB)\n");
     unsigned i;
     TranslationEntry tlb_entry;
+
     for(i = 0; i < TLB_SIZE; i++){
-	tlb_entry = machine->tlb[i];
-	if(tlb_entry.valid == true){
-        pageTable[machine->tlb[i].virtualPage] = tlb_entry;
-        }
-        tlb_entry.valid = false;
+	    tlb_entry = machine->tlb[i];
+	    if(tlb_entry.valid == true)
+            pageTable[machine->tlb[i].virtualPage] = tlb_entry;
+        machine->tlb[i].valid = false;
     }
 #endif
 }
@@ -315,7 +317,7 @@ TranslationEntry AddressSpace::bringPage(unsigned pos)
     return pageTable[pos];
 }
 
-
+// Dual of bringPage
 void AddressSpace::copyPage(unsigned from, unsigned to)
 {
     pageTable[to] = machine->tlb[from];

@@ -304,7 +304,7 @@ insertTLB(TranslationEntry entry)
         }
     }
     //if TLB is full (semi-random policy)
-    i = rand() % 4;
+    i = rand() % TLB_SIZE;
     currentThread->space->copyPage(i, machine->tlb[i].virtualPage);
     machine->tlb[i] = entry;
 }
