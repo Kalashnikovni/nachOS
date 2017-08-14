@@ -7,6 +7,9 @@ main(int argc, char **argv)
 {
     int i;
     char *error = "Error al intentar abrir archivo, reintente\n";
+    char n = (char) argc;
+
+    Write(&n, 1, ConsoleOutput);
 
     for(i = 1; i < argc; i++){
         OpenFileId fid = Open(argv[i]);
@@ -19,7 +22,7 @@ main(int argc, char **argv)
         else
             Write(error, 50, ConsoleOutput);
 
-        Close(argv[i]);
+        Close(fid);
     }
 
     Exit(0);

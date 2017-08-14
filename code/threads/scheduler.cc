@@ -18,8 +18,8 @@
 /// limitation of liability and disclaimer of warranty provisions.
 
 
-#include "scheduler.hh"
-#include "system.hh"
+#include "threads/scheduler.hh"
+#include "threads/system.hh"
 
 
 /// Initialize the list of ready but not running threads to empty.
@@ -96,6 +96,7 @@ Scheduler::Run(Thread *nextThread)
 
     DEBUG('t', "Switching from thread \"%s\" to thread \"%s\"\n",
           oldThread->getName(), nextThread->getName());
+    //Print();
 
     // This is a machine-dependent assembly language routine defined in
     // `switch.s`.  You may have to think a bit to figure out what happens

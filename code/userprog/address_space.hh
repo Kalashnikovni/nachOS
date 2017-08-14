@@ -14,14 +14,15 @@
 #define NACHOS_USERPROG_ADDRSPACE__HH
 
 
+#include "bin/noff.h"
 #include "filesys/file_system.hh"
 #include "machine/translation_entry.hh"
-#include "bin/noff.h"
 #include <math.h>
 
 
 const unsigned USER_STACK_SIZE = 1024;  ///< Increase this as necessary!
 
+class Coremap;
 
 class AddressSpace {
 public:
@@ -43,15 +44,15 @@ public:
     void SaveState();
     void RestoreState();
 
-    TranslationEntry bringPage(unsigned i);
-    void copyPage(unsigned from, unsigned to);
+    TranslationEntry BringPage(unsigned i) { return pageTable[i]; };
+    void CopyPage(unsigned from, unsigned to);
 
-    void LoadSegment(int vaddr);
+    void LoadPage(int vaddr);
 
     void SaveToSwap(int vpn);
     void LoadFromSwap(int vpn, int ppn);
 
-    bool InvalidVPN(int vaddr) { return vaddr >= numPages * 128; };
+    int GetNumPages() { return numPages; };
 
 private:
 

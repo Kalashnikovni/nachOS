@@ -63,9 +63,9 @@
 /// limitation of liability and disclaimer of warranty provisions.
 
 
-#include "copyright.h"
-#include "utility.hh"
-#include "system.hh"
+#include "threads/copyright.h"
+#include "threads/utility.hh"
+#include "threads/system.hh"
 
 
 // External functions used by this file.

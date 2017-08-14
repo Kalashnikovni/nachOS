@@ -85,12 +85,20 @@ Machine::OneInstruction(Instruction *instr)
                instr->RegFromType(str->args[1]),
                instr->RegFromType(str->args[2]));
         printf("\n");
+        if(str->args[0] > 0 && str->args[0] < 4)
+            printf("%d ", machine->ReadRegister(instr->RegFromType(str->args[0])));
+        if(str->args[1] > 0 && str->args[1] < 4)
+            printf("%d ", machine->ReadRegister(instr->RegFromType(str->args[1])));
+        if(str->args[2] > 0 && str->args[2] < 4)
+            printf("%d ", machine->ReadRegister(instr->RegFromType(str->args[2])));
+        //printf("%d ", machine->ReadRegister(3));
+        printf("\n");
     }
 
     // Compute next pc, but do not install in case there is an error or
     // branch.
     int      pcAfter = registers[NEXT_PC_REG] + 4;
-    int      sum, diff, tmp, value;
+    int      sum, diff, tmp, value, one;
     unsigned rs, rt, imm;
 
     // Execute the instruction (cf. Kane's book).

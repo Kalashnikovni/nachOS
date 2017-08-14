@@ -39,7 +39,8 @@ int
 main(int argc, char **argv)
 {
     int i, line;
-    char *error = "Error al intentar abrir archivo, reintente\n", eol = '\n';
+    char *error = "Error al intentar abrir archivo, reintente\n", eol = '\n', n;
+
     for(i = 1; i < argc; i++){
         OpenFileId fid = Open(argv[i]);
         if(fid != -1){
@@ -53,13 +54,11 @@ main(int argc, char **argv)
                     line++;
                 }
             }
+            Write(&eol, 1, ConsoleOutput);
+            Close(fid);
         }
-        else{
+        else
             Write(error, 50, ConsoleOutput);
-        }
-
-        Write(&eol, 1, ConsoleOutput);
-        Close(argv[i]);
     }
 
     Exit(0);

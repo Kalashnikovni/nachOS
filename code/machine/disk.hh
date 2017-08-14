@@ -19,7 +19,7 @@
 #define NACHOS_MACHINE_DISK__HH
 
 
-#include "utility.hh"
+#include "threads/utility.hh"
 
 
 /// The following class defines a physical disk I/O device.

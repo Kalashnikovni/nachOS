@@ -17,10 +17,10 @@
 /// limitation of liability and disclaimer of warranty provisions.
 
 
-#include "thread.hh"
-#include "switch.h"
-#include "synch.hh"
-#include "system.hh"
+#include "threads/thread.hh"
+#include "threads/switch.h"
+#include "threads/synch.hh"
+#include "threads/system.hh"
 
 
 /// This is put at the top of the execution stack, for detecting stack
@@ -134,7 +134,7 @@ Thread::CheckOverflow()
 /// NOTE: we disable interrupts, so that we do not get a time slice between
 /// setting `threadToBeDestroyed`, and going to sleep.
 void
-Thread::Finish(int status)
+Thread::Finish(int stat)
 {
     interrupt->SetLevel(INT_OFF);
     ASSERT(this == currentThread);
@@ -142,7 +142,7 @@ Thread::Finish(int status)
     DEBUG('t', "Finishing thread \"%s\"\n", getName());
 
     if (isJoineable)
-        joinPort->Send(status); //Waits for father to end
+        joinPort->Send(stat); //Waits for father to end
 
     threadToBeDestroyed = currentThread;
     Sleep();  // Invokes `SWITCH`.
@@ -269,14 +269,15 @@ Thread::StackAllocate(VoidFunctionPtr func, void *arg)
 ///
 ///
 ///
-void
+int
 Thread::Join()
 {
-    ASSERT(joinPort != NULL);
     int retAddr;
+    ASSERT(joinPort != NULL);
     joinPort->Receive(&retAddr); //Wait for child to return.
+    return retAddr;
 
-    delete joinPort;
+    //delete joinPort;
 }
 
 ///
@@ -330,7 +331,7 @@ Thread::CloseAllFiles()
 
 
 #ifdef USER_PROGRAM
-#include "machine.hh"
+#include "machine/machine.hh"
 
 /// Save the CPU state of a user program on a context switch.
 ///
@@ -358,3 +359,12 @@ Thread::RestoreUserState()
 
 
 #endif
+
+int 
+Thread::getPriority()
+{
+    if(priority < SCHEDULER_PRIORITY_NUMBER)
+        return priority;
+    return SCHEDULER_PRIORITY_NUMBER;
+}
+

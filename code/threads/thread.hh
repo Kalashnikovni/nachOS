@@ -39,8 +39,8 @@
 #define NACHOS_THREADS_THREAD__HH
 
 
-#include "utility.hh"
 #include "filesys/open_file.hh"
+#include "threads/utility.hh"
 #include "userprog/syscall.h"
 
 #ifdef USER_PROGRAM
@@ -120,10 +120,10 @@ public:
     void Sleep();
 
     /// The thread is done executing.
-    void Finish(int status = 0);
+    void Finish(int stat = 0);
 
     /// The thread waits for a children.
-    void Join();
+    int Join();
 
     /// Check if thread has overflowed its stack.
     void CheckOverflow();
@@ -143,10 +143,7 @@ public:
         printf("%s, ", name);
     }
 
-    int getPriority()
-    {
-        return priority;
-    }
+    int getPriority();
 
     void setPriority(int p)
     {
@@ -165,6 +162,8 @@ public:
     OpenFile *GetFile(OpenFileId fid);
 
     void CloseAllFiles();
+
+    bool isJoineable;
 
 private:
     // Some of the private data for this class is listed above.
@@ -186,8 +185,6 @@ private:
     /// Private data for Join:
     /// Port for Join children procs
     Port *joinPort;
-    ///
-    bool isJoineable;
 
     int priority;
 

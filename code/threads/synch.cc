@@ -22,8 +22,8 @@
 /// limitation of liability and disclaimer of warranty provisions.
 
 
-#include "synch.hh"
-#include "system.hh"
+#include "threads/synch.hh"
+#include "threads/system.hh"
 
 
 /// Initialize a semaphore, so that it can be used for synchronization.
@@ -109,8 +109,9 @@ Lock::~Lock()
 void
 Lock::Acquire()
 {
-    //if (currentThread->getPriority() > holder->getPriority())
-    //    holder->setPriority(currentThread->getPriority());        
+    if(this->IsHeldByCurrentThread())
+        return;
+
     if (holder != NULL) {
         int currentPriority = currentThread->getPriority();
         if (holder->getPriority() < currentPriority)
@@ -126,7 +127,7 @@ Lock::Release()
 {
     if(IsHeldByCurrentThread()) {
         currentThread->setPriority(currentThread->getOriginalPriority());
-        holder = NULL;
+	holder = NULL;
         locksem->V();
     }
 }

@@ -15,10 +15,10 @@
 /// All rights reserved.  See `copyright.h` for copyright notice and
 /// limitation of liability and disclaimer of warranty provisions.
 
-
-#include "address_space.hh"
+#include "userprog/address_space.hh"
 #include "threads/system.hh"
 
+void LoadPage(int vaddr);
 
 /// Do little endian to big endian conversion on the bytes in the object file
 /// header, in case the file was generated on a little endian machine, and we
@@ -39,10 +39,9 @@ SwapHeader(NoffHeader *noffH)
     noffH->uninitData.inFileAddr  = WordToHost(noffH->uninitData.inFileAddr);
 }
 
-#ifdef USE_DML
 //Load a single page from the noffH where the address addr is
 void
-AddressSpace::LoadSegment(int vaddr)
+AddressSpace::LoadPage(int vaddr)
 {
     DEBUG('z',"Loading segment from addr: %u\n",vaddr);
     Segment segment;
@@ -63,13 +62,13 @@ AddressSpace::LoadSegment(int vaddr)
 #ifndef VMEM
     int ppn = vpages->Find();
 #else
-    int ppn = coremap->Find(currentThread->space, vpn);
+    int ppn = coremap->Find(this, vpn);
 #endif
     ASSERT(ppn >= 0);
     pageTable[vpn].physicalPage = ppn;
-    int pp = ppn * PAGE_SIZE;
+    int pp  = ppn * PAGE_SIZE;
 
-    for (int j = 0; (j < (int)PAGE_SIZE) && (j < executable->Length() - vpn * (int)PAGE_SIZE - segment.inFileAddr); j++){
+    for (int j = 0; (j < (int)PAGE_SIZE) && (j < executable->Length() - vaddr - 40); j++){//vpn * (int)PAGE_SIZE - segment.inFileAddr); j++){
         char c;
 
         if(!zeroOut){ // Load the data
@@ -85,15 +84,15 @@ AddressSpace::LoadSegment(int vaddr)
 
     pageTable[vpn].valid = true; //Now that the page is loaded, set it as valid
 }
-#endif
 
 #ifdef VMEM
 // Write a page to SWAP
 void
 AddressSpace::SaveToSwap(int vpn)
 {
-    DEBUG('8', "SAVE PAGE: %d\n", vpn);
     int ppn = pageTable[vpn].physicalPage;
+    if(ppn >= 0){
+    DEBUG('y', "PHYSPAGE: %d\n", ppn);
     swapfile->WriteAt(&machine->mainMemory[ppn * PAGE_SIZE], PAGE_SIZE, vpn * PAGE_SIZE);
     /*Invalidar la entrada TLB si es el mismo proceso*/
 #ifdef USE_TLB
@@ -106,15 +105,15 @@ AddressSpace::SaveToSwap(int vpn)
         }
     }
 #endif
-    pageTable[vpn].valid = false;
+    //pageTable[vpn].valid = false;  /* TODO NO DEBERIA INVALIDARSE LA PAGINA!!!!!*/
     pageTable[vpn].physicalPage = -2;
-}
+    bzero(&(machine->mainMemory[ppn * PAGE_SIZE]), PAGE_SIZE); // Clean addressSpace
+}}
 
 // Load a page from SWAP
 void
 AddressSpace::LoadFromSwap(int vpn, int ppn)
 {
-    DEBUG('8', "LOAD PAGE: %d\n", vpn);
     swapfile->ReadAt(&machine->mainMemory[ppn * PAGE_SIZE], PAGE_SIZE, vpn * PAGE_SIZE);
     pageTable[vpn].physicalPage = ppn;
     pageTable[vpn].valid = true;
@@ -176,13 +175,19 @@ AddressSpace::AddressSpace(OpenFile *exec)
     pageTable = new TranslationEntry[numPages]; 
     for (unsigned i = 0; i < numPages; i++) {
         pageTable[i].virtualPage  = i;
+        pageTable[i].physicalPage  = i;
 #ifdef USE_DML
         pageTable[i].physicalPage = -1;
         pageTable[i].valid        = false;
 #else
-        pageTable[i].physicalPage = vpages->Find(); 
+#ifdef VMEM
+        pageTable[i].physicalPage = coremap->Find(this, i);
+        coremap->SetDirty(pageTable[i].physicalPage);
+#else
+        pageTable[i].physicalPage = vpages->Find();
+#endif
         ASSERT(pageTable[i].physicalPage >=0); 
-        DEBUG('j',"Assigning physPage: [%d]%d \n",i ,pageTable[i].physicalPage);
+        DEBUG('j', "Assigning physPage: [%d]%d \n", i, pageTable[i].physicalPage);
         pageTable[i].valid        = true;
 #endif
         pageTable[i].use          = false;
@@ -198,13 +203,16 @@ AddressSpace::AddressSpace(OpenFile *exec)
     // Zero out the entire address space, to zero the unitialized data
     // segment and the stack segment.
     for (unsigned i = 0; i < numPages; i++) {
-        if((int)pageTable[i].physicalPage>= 0) {
+        if((int)pageTable[i].physicalPage >= 0){
             DEBUG('j', "Zeroing out [%d]%d \n", i, pageTable[i].physicalPage);
             bzero(&(machine->mainMemory[pageTable[i].physicalPage * PAGE_SIZE]), PAGE_SIZE);
         }
     }
 
-    DEBUG('a', "Finished zeroing out the pagetable address... \n");
+    for(int j = 0; j < numPages; j++)
+        LoadPage(j * PAGE_SIZE);
+
+    /*DEBUG('a', "Finished zeroing out the pagetable address... \n");
 
     // Then, copy in the code and data segments into memory.
     if (noffH.code.size > 0) {
@@ -234,7 +242,7 @@ AddressSpace::AddressSpace(OpenFile *exec)
             int paddr  = pp + offset;
             machine->mainMemory[paddr] = c;
         }
-    }
+    }*/
 #endif
 }
 
@@ -243,10 +251,13 @@ AddressSpace::AddressSpace(OpenFile *exec)
 /// Nothing for now!
 AddressSpace::~AddressSpace()
 {
+#ifndef VMEM
     unsigned i;
     for(i=0; i < numPages; i++)
         vpages->Clear(pageTable[i].physicalPage);
     delete [] pageTable;
+#else
+#endif
 }
 
 /// Set the initial values for the user-level register set.
@@ -278,7 +289,8 @@ AddressSpace::InitRegisters()
 
 /// On a context switch, save any machine state, specific to this address
 /// space, that needs saving.
-void AddressSpace::SaveState()
+void 
+AddressSpace::SaveState()
 {
 #ifdef USE_TLB
     DEBUG('b', "Saving state (TLB)\n");
@@ -298,28 +310,22 @@ void AddressSpace::SaveState()
 /// can run.
 ///
 /// For now, tell the machine where to find the page table.
-void AddressSpace::RestoreState()
+void 
+AddressSpace::RestoreState()
 {
 #ifdef USE_TLB
-DEBUG('b', "Restoring state (TLB)\n");
-unsigned i;
-for(i = 0; i < TLB_SIZE; i++)
-    machine->tlb[i].valid = false;
+    DEBUG('b', "Restoring state (TLB)\n");
+    unsigned i;
+
+    for(i = 0; i < TLB_SIZE; i++)
+        machine->tlb[i].valid = false;
 #else
-machine->pageTable     = pageTable;
-machine->pageTableSize = numPages;
+    machine->pageTable     = pageTable;
 #endif
+    machine->pageTableSize = numPages;
 }
 
-
-TranslationEntry AddressSpace::bringPage(unsigned pos)
-{
-    return pageTable[pos];
+void AddressSpace::CopyPage(unsigned from, unsigned to) 
+{ 
+    pageTable[to] = machine->tlb[from]; 
 }
-
-// Dual of bringPage
-void AddressSpace::copyPage(unsigned from, unsigned to)
-{
-    pageTable[to] = machine->tlb[from];
-}
-

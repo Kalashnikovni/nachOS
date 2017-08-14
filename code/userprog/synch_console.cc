@@ -1,7 +1,7 @@
 //
 //
 
-#include "synch_console.hh"
+#include "userprog/synch_console.hh"
 
 // Constructor. Create instances of lock and console.
 // Use arguments as NULL to read from stdin and write to stdout

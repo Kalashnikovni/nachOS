@@ -6,8 +6,8 @@
 /// limitation of liability and disclaimer of warranty provisions.
 
 
-#include "system.hh"
-#include "preemptive.hh"
+#include "threads/system.hh"
+#include "threads/preemptive.hh"
 
 
 /// This defines *all* of the global data structures used by Nachos.
@@ -36,18 +36,21 @@ SynchDisk *synchDisk;
 
 #ifdef USER_PROGRAM  // Requires either *FILESYS* or *FILESYS_STUB*.
 Machine *machine;  ///< User program memory and registers.
-BitMap *vpages;               ///< Keep track of translation from vpages to physpages.
 Thread **ptable;    ///< Keep track of process pid and address space.
 SynchConsole *sconsole;
+
+#ifndef VMEM
+BitMap *vpages;               ///< Keep track of translation from vpages to physpages.
+#else
+Coremap *coremap;
+#endif
+
 #endif
 
 #ifdef NETWORK
 PostOffice *postOffice;
 #endif
 
-#ifdef VMEM
-Coremap *coremap;
-#endif
 
 // External definition, to allow us to take a pointer to this function.
 extern void Cleanup();
@@ -166,7 +169,7 @@ Initialize(int argc, char **argv)
     // We did not explicitly allocate the current thread we are running in.
     // But if it ever tries to give up the CPU, we better have a `Thread`
     // object to save its state.
-    currentThread = new Thread("main");
+    currentThread = new Thread("main", SCHEDULER_PRIORITY_NUMBER - 1, true);
     currentThread->setStatus(RUNNING);
 
     interrupt->Enable();
@@ -180,7 +183,11 @@ Initialize(int argc, char **argv)
 
 #ifdef USER_PROGRAM
     machine = new Machine(debugUserProg);  // This must come first.
+#ifndef VMEM
     vpages  = new BitMap(NUM_PHYS_PAGES);   // Create the translator.
+#else
+    coremap = new Coremap(NUM_PHYS_PAGES);
+#endif
     ptable  = new Thread * [MAX_NPROCS]();
     sconsole = new SynchConsole(NULL,NULL);   // Use default in, out
 #endif
@@ -195,10 +202,6 @@ Initialize(int argc, char **argv)
 
 #ifdef NETWORK
     postOffice = new PostOffice(netname, rely, 10);
-#endif
-
-#ifdef VMEM
-    coremap = new Coremap(NUM_PHYS_PAGES);
 #endif
 }
 
@@ -217,7 +220,11 @@ Cleanup()
 
 #ifdef USER_PROGRAM
     delete machine;
+#ifndef VMEM
     delete vpages;
+#else
+    delete coremap;
+#endif
 #endif
 
 #ifdef FILESYS_NEEDED
@@ -228,9 +235,6 @@ Cleanup()
     delete synchDisk;
 #endif
 
-#ifdef VMEM
-    delete coremap;
-#endif
 
     delete timer;
     delete scheduler;

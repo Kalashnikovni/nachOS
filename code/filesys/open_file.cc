@@ -11,8 +11,8 @@
 /// limitation of liability and disclaimer of warranty provisions.
 
 
-#include "open_file.hh"
-#include "file_header.hh"
+#include "filesys/open_file.hh"
+#include "filesys/file_header.hh"
 #include "threads/system.hh"
 
 
