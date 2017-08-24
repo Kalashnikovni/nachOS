@@ -51,8 +51,7 @@ public:
     void SaveToSwap(int vpn);
     void LoadFromSwap(int vpn, int ppn);
 
-    bool InvalidVPN(int vaddr) { return vaddr >= numPages * 128; };
-
+    bool InvalidVPN(int vaddr);
 private:
 
     /// Assume linear page table translation for now!

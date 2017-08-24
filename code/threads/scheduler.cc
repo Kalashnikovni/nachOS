@@ -82,7 +82,7 @@ Scheduler::Run(Thread *nextThread)
 
 #ifdef USER_PROGRAM  // Ignore until running user programs.
     if (currentThread->space != NULL) {
-        // If this thread is a user program, save the user's CPU registers.
+        // If this thread is a user program, save the user's CPU registers and TranslationEntrys.
         currentThread->SaveUserState();
         currentThread->space->SaveState();
     }

@@ -219,7 +219,7 @@ ExceptionHandler(ExceptionType which)
         int vaddr = machine->registers[BAD_VADDR_REG];
         int vpn   = vaddr/PAGE_SIZE;
         if((vaddr < 0) || currentThread->space->InvalidVPN(vaddr)){
-            DEBUG('b', "Page fault exception error in address \n");
+            DEBUG('b', "Page fault exception error in address %d\n", vaddr);
             ASSERT(false);
         }
 #ifdef USE_DML

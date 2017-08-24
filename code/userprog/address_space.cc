@@ -186,7 +186,11 @@ AddressSpace::AddressSpace(OpenFile *exec)
         pageTable[i].valid        = true;
 #endif
         pageTable[i].use          = false;
+#ifdef VMEM 
+        pageTable[i].dirty        = true;                  //esto avisa que la pag nunca fue a swap
+#else
         pageTable[i].dirty        = false;
+#endif
         pageTable[i].readOnly     = false;
         // If the code segment was entirely on a separate page, we could
         // set its pages to be read-only.
@@ -323,3 +327,4 @@ void AddressSpace::copyPage(unsigned from, unsigned to)
     pageTable[to] = machine->tlb[from];
 }
 
+bool AddressSpace::InvalidVPN(int vaddr) { DEBUG('5', "numPages:%d\n", numPages);return vaddr >= numPages * PAGE_SIZE; };
