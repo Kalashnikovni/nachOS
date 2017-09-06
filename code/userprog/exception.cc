@@ -229,11 +229,12 @@ ExceptionHandler(ExceptionType which)
                     Thread *t        = new Thread(strdup(name), 0, true); //All threads start as joinable
                     pid              = NewPid(t);
                     ASSERT(pid != -1);
-                    //StartProc will WriteArgs (leaving r4 and r5 as argc and argv)
-                    t->Fork(StartProc, args);
 
                     AddressSpace *as = new AddressSpace(exec);
                     t->space         = as;
+
+                    //StartProc will WriteArgs (leaving r4 and r5 as argc and argv)
+                    t->Fork(StartProc, args);
                 }
 
                 machine->WriteRegister(2, pid);
@@ -262,12 +263,12 @@ ExceptionHandler(ExceptionType which)
 #endif
 
 #ifdef USE_DML
-        if(currentThread->space->BringPage(vpn).physicalPage == -1){
+        if(currentThread->space->BringPage(vpn).physicalPage == -1)
             currentThread->space->LoadPage(vaddr);
-        }
 #endif
-
+#ifdef USE_TLB
         insertTLB(currentThread->space->BringPage(vpn));
+#endif
 
     } else if (which == READ_ONLY_EXCEPTION){
         DEBUG('b', "Read only exception encountered \n");
@@ -310,8 +311,8 @@ StartProc(void *args)
 SpaceId
 NewPid(Thread *t)
 {
-    for(int i = 1; i < MAX_NPROCS; i++) 
-        if(ptable[i]==NULL){
+    for(int i = 2; i < MAX_NPROCS; i++) 
+        if(ptable[i]==NULL && t){
             ptable[i] = t;
             return i;
         }
@@ -343,9 +344,4 @@ insertTLB(TranslationEntry entry)
     i = rand() % TLB_SIZE;
     currentThread->space->CopyPage(i, machine->tlb[i].virtualPage);
     machine->tlb[i] = entry;
-
-    //Copy page to memory
-    /*for(int j = 0; (j < (int)PAGE_SIZE); j++){
-          
-    }*/
 }

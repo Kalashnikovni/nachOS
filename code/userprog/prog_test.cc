@@ -21,6 +21,8 @@
 void
 StartProcess(const char *filename)
 {
+    ptable[0] = currentThread;
+
     OpenFile *executable = fileSystem->Open(filename);
     AddressSpace *space;
 
@@ -28,14 +30,16 @@ StartProcess(const char *filename)
         printf("Unable to open file %s\n", filename);
         return;
     }
-    ptable[0] = currentThread;
+
     space = new AddressSpace(executable);
     currentThread->space = space;
 
     //delete executable;
 
+
     space->InitRegisters();  // Set the initial register values.
     space->RestoreState();   // Load page table register.
+
 
     machine->Run();  // Jump to the user progam.
     ASSERT(false);   // `machine->Run` never returns; the address space

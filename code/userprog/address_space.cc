@@ -92,31 +92,31 @@ AddressSpace::SaveToSwap(int vpn)
 {
     int ppn = pageTable[vpn].physicalPage;
     if(ppn >= 0){
-    DEBUG('y', "PHYSPAGE: %d\n", ppn);
-    swapfile->WriteAt(&machine->mainMemory[ppn * PAGE_SIZE], PAGE_SIZE, vpn * PAGE_SIZE);
-    /*Invalidar la entrada TLB si es el mismo proceso*/
+        ASSERT(ppn * PAGE_SIZE < MEMORY_SIZE);
+        swapfile->WriteAt(&machine->mainMemory[ppn * PAGE_SIZE], PAGE_SIZE, vpn * PAGE_SIZE);
+        /*Invalidar la entrada TLB si es el mismo proceso*/
 #ifdef USE_TLB
-    if(this == currentThread->space){
-        for (int i = 0; i < TLB_SIZE; i++){
-            if (machine->tlb[i].valid && machine->tlb[i].virtualPage == vpn) {
-                pageTable[machine->tlb[i].virtualPage] = machine->tlb[i];
-                machine->tlb[i].valid = false;
+        if(this == currentThread->space){
+            for (int i = 0; i < TLB_SIZE; i++){
+                if (machine->tlb[i].valid && machine->tlb[i].virtualPage == vpn) {
+                    pageTable[machine->tlb[i].virtualPage] = machine->tlb[i];
+                    machine->tlb[i].valid = false;
+                }
             }
         }
-    }
 #endif
-    //pageTable[vpn].valid = false;  /* TODO NO DEBERIA INVALIDARSE LA PAGINA!!!!!*/
-    pageTable[vpn].physicalPage = -2;
-    bzero(&(machine->mainMemory[ppn * PAGE_SIZE]), PAGE_SIZE); // Clean addressSpace
-}}
+        //pageTable[vpn].valid = false;  /* TODO NO DEBERIA INVALIDARSE LA PAGINA!!!!!*/
+        pageTable[vpn].physicalPage = -2;
+    }
+}
 
 // Load a page from SWAP
 void
 AddressSpace::LoadFromSwap(int vpn, int ppn)
 {
-    swapfile->ReadAt(&machine->mainMemory[ppn * PAGE_SIZE], PAGE_SIZE, vpn * PAGE_SIZE);
     pageTable[vpn].physicalPage = ppn;
     pageTable[vpn].valid = true;
+    swapfile->ReadAt(&machine->mainMemory[ppn * PAGE_SIZE], PAGE_SIZE, vpn * PAGE_SIZE);
 }
 #endif
 
@@ -165,7 +165,7 @@ AddressSpace::AddressSpace(OpenFile *exec)
     }
     ASSERT(ptable[j] == currentThread);
     char sname[128];//5 + (int)(log10(j) + 1) + 1];
-    sprintf(sname, "SWAP.%d", j);
+    sprintf(sname, "SWAP.%d", 0);
     ASSERT(fileSystem->Create(sname, size)); //TODO: DELETE
     swapfile = fileSystem->Open(sname);
 #endif
@@ -209,10 +209,7 @@ AddressSpace::AddressSpace(OpenFile *exec)
         }
     }
 
-    for(int j = 0; j < numPages; j++)
-        LoadPage(j * PAGE_SIZE);
-
-    /*DEBUG('a', "Finished zeroing out the pagetable address... \n");
+    DEBUG('a', "Finished zeroing out the pagetable address... \n");
 
     // Then, copy in the code and data segments into memory.
     if (noffH.code.size > 0) {
@@ -242,7 +239,7 @@ AddressSpace::AddressSpace(OpenFile *exec)
             int paddr  = pp + offset;
             machine->mainMemory[paddr] = c;
         }
-    }*/
+    }
 #endif
 }
 
@@ -251,12 +248,17 @@ AddressSpace::AddressSpace(OpenFile *exec)
 /// Nothing for now!
 AddressSpace::~AddressSpace()
 {
-#ifndef VMEM
     unsigned i;
+
+#ifndef VMEM
     for(i=0; i < numPages; i++)
-        vpages->Clear(pageTable[i].physicalPage);
+        vpages->Clear(unsigned(pageTable[i].physicalPage));
     delete [] pageTable;
 #else
+    for(i=0; i < numPages; i++)
+        if(pageTable[i].physicalPage > -1)
+            coremap->Clear(unsigned(pageTable[i].physicalPage));
+    delete [] pageTable;
 #endif
 }
 
@@ -299,9 +301,9 @@ AddressSpace::SaveState()
 
     for(i = 0; i < TLB_SIZE; i++){
 	    tlb_entry = machine->tlb[i];
-	    if(tlb_entry.valid == true)
-            pageTable[machine->tlb[i].virtualPage] = tlb_entry;
-        machine->tlb[i].valid = false;
+	    if(tlb_entry.valid)
+            pageTable[tlb_entry.virtualPage] = tlb_entry;
+        tlb_entry.valid = false;
     }
 #endif
 }
@@ -321,8 +323,8 @@ AddressSpace::RestoreState()
         machine->tlb[i].valid = false;
 #else
     machine->pageTable     = pageTable;
-#endif
     machine->pageTableSize = numPages;
+#endif
 }
 
 void AddressSpace::CopyPage(unsigned from, unsigned to) 
