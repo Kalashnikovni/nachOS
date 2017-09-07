@@ -247,7 +247,7 @@ ExceptionHandler(ExceptionType which)
         DEBUG('b', "Page fault exception encountered \n");
         int vaddr = machine->ReadRegister(BAD_VADDR_REG);
         int vpn   = vaddr/PAGE_SIZE;
-        if((vpn < 0) || (vpn >= currentThread->space->GetNumPages())){
+        if((vpn < 0) || (vpn > currentThread->space->GetNumPages())){
             DEBUG('p', "Page fault exception error in address %d\nWith proces limit %d\n", vaddr, (currentThread->space->GetNumPages() * PAGE_SIZE));
             ASSERT(false);
         }

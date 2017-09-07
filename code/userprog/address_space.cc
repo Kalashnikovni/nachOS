@@ -303,7 +303,7 @@ AddressSpace::SaveState()
 	    tlb_entry = machine->tlb[i];
 	    if(tlb_entry.valid)
             pageTable[tlb_entry.virtualPage] = tlb_entry;
-        tlb_entry.valid = false;
+        //tlb_entry.valid = false;
     }
 #endif
 }
